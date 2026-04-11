@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Use of the class archipelago &#8212; pygmo 2.19.6 documentation</title>
+    <title>Use of the class archipelago &#8212; pygmo 2.19.8 documentation</title>
   
   
   
@@ -121,7 +121,7 @@
   
   
   
-    <p class="title logo__title">pygmo 2.19.6 documentation</p>
+    <p class="title logo__title">pygmo 2.19.8 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -414,34 +414,34 @@ purpose of this tutorial. Its mathematical definition is:</p>
 <p>and the optimal value for the objective function is 0. We can write the above problem as a pygmo UDP (see:
 <a class="reference internal" href="coding_udp_simple.html#py-tutorial-coding-udp-simple"><span class="std std-ref">Coding a simple User Defined Problem</span></a> and <a class="reference internal" href="coding_udp_constrained.html#py-tutorial-coding-udp-constrained"><span class="std std-ref">Coding a User Defined Problem with constraints (NLP)</span></a> to learn how UDPs are
 defined from Python)</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">toy_problem</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">):</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span><span class="w"> </span><span class="nc">toy_problem</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">):</span>
 <span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span class="n">dim</span>
 <span class="gp">...</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="nf">fitness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">fitness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
 <span class="gp">... </span>        <span class="k">return</span> <span class="p">[</span><span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="mi">1</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">),</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)]</span>
 <span class="gp">...</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
 <span class="gp">... </span>        <span class="k">return</span> <span class="n">pg</span><span class="o">.</span><span class="n">estimate_gradient</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitness</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">x</span><span class="p">)</span> <span class="c1"># numerical gradient</span>
 <span class="gp">...</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="nf">get_nec</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">get_nec</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="gp">... </span>        <span class="k">return</span> <span class="mi">1</span>
 <span class="gp">...</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="nf">get_nic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">get_nic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="gp">... </span>        <span class="k">return</span> <span class="mi">1</span>
 <span class="gp">...</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="nf">get_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">get_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="gp">... </span>        <span class="k">return</span> <span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">)</span>
 <span class="gp">...</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="gp">... </span>        <span class="k">return</span> <span class="s2">&quot;A toy problem&quot;</span>
 <span class="gp">...</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="nf">get_extra_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">get_extra_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="gp">... </span>        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Dimensions: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Now, without further ado, lets use the full power of pygmo and prepare to be shocked:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pygmo</span> <span class="k">as</span> <span class="nn">pg</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pygmo</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pg</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a_cstrs_sa</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">algorithm</span><span class="p">(</span><span class="n">pg</span><span class="o">.</span><span class="n">cstrs_self_adaptive</span><span class="p">(</span><span class="n">iters</span><span class="o">=</span><span class="mi">1000</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p_toy</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">problem</span><span class="p">(</span><span class="n">toy_problem</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p_toy</span><span class="o">.</span><span class="n">c_tol</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1e-4</span><span class="p">,</span> <span class="mf">1e-4</span><span class="p">]</span>
@@ -539,17 +539,17 @@ most likely other local algorithm would, in this case, be a superior choice.</p>
 in the <a class="reference internal" href="using_island.html#py-tutorial-using-island"><span class="std std-ref">island tutorial</span></a> and since an <a class="reference internal" href="../archipelago.html#pygmo.archipelago" title="pygmo.archipelago"><code class="xref py py-class docutils literal notranslate"><span class="pre">archipelago</span></code></a> is, basically, a container for multiple <a class="reference internal" href="../island.html#pygmo.island" title="pygmo.island"><code class="xref py py-class docutils literal notranslate"><span class="pre">island</span></code></a>
 here we will overlap with part of that tutorial, exploring exceptions thrown in the <a class="reference internal" href="../archipelago.html#pygmo.archipelago" title="pygmo.archipelago"><code class="xref py py-class docutils literal notranslate"><span class="pre">archipelago</span></code></a> context.</p>
 <p>To show how pygmo handles these situations we use the fake problem below throwing as soon as 300 fitness evaluations are made.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">raise_exception</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span><span class="w"> </span><span class="nc">raise_exception</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">counter</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="nf">fitness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">dv</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">fitness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">dv</span><span class="p">):</span>
 <span class="gp">... </span>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">==</span> <span class="mi">300</span><span class="p">:</span>
 <span class="gp">... </span>            <span class="k">raise</span>
 <span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
 <span class="gp">... </span>        <span class="k">return</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="nf">get_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">get_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="gp">... </span>        <span class="k">return</span> <span class="p">([</span><span class="mi">0</span><span class="p">],[</span><span class="mi">1</span><span class="p">])</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="gp">... </span>        <span class="k">return</span> <span class="s2">&quot;A throwing UDP&quot;</span>
 </pre></div>
 </div>

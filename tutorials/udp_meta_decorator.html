@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Using the decorator meta-problem &#8212; pygmo 2.19.6 documentation</title>
+    <title>Using the decorator meta-problem &#8212; pygmo 2.19.8 documentation</title>
   
   
   
@@ -119,7 +119,7 @@
   
   
   
-    <p class="title logo__title">pygmo 2.19.6 documentation</p>
+    <p class="title logo__title">pygmo 2.19.8 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -421,7 +421,7 @@ on the situation, may be more appropriate than the <a class="reference internal"
 <p>Like all meta-problems, <a class="reference internal" href="../problems.html#pygmo.decorator_problem" title="pygmo.decorator_problem"><code class="xref py py-class docutils literal notranslate"><span class="pre">decorator_problem</span></code></a> accepts a UDP as a construction parameter.
 In this example, we will use a <a class="reference internal" href="../problems.html#pygmo.rosenbrock" title="pygmo.rosenbrock"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rosenbrock</span></code></a> problem for illustration
 purposes (and to show that <a class="reference internal" href="../problems.html#pygmo.decorator_problem" title="pygmo.decorator_problem"><code class="xref py py-class docutils literal notranslate"><span class="pre">decorator_problem</span></code></a> works also with exposed C++ problems):</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pygmo</span> <span class="k">as</span> <span class="nn">pg</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pygmo</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pg</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rb</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">rosenbrock</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -465,9 +465,9 @@ be that printing <em>drb</em> to screen will tell us that <em>rb</em> has been w
 <p>Let us now write our first decorator. This decorator is meant to be applied to the fitness
 function of the Rosenbrock problem. In addition to returning the original fitness,
 it will also print on screen the time needed to compute it. The code is as follows:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">f_decor</span><span class="p">(</span><span class="n">orig_fitness_function</span><span class="p">):</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="nf">new_fitness_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dv</span><span class="p">):</span>
-<span class="gp">... </span>        <span class="kn">import</span> <span class="nn">time</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">f_decor</span><span class="p">(</span><span class="n">orig_fitness_function</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">new_fitness_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dv</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 <span class="gp">... </span>        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span>
 <span class="gp">... </span>        <span class="n">fitness</span> <span class="o">=</span> <span class="n">orig_fitness_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dv</span><span class="p">)</span>
 <span class="gp">... </span>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Elapsed time: </span><span class="si">{}</span><span class="s2"> seconds&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">))</span>
@@ -480,7 +480,7 @@ a new fitness function. <code class="docutils literal notranslate"><span class="
 by the UDP interface: it takes as input parameters the calling <a class="reference internal" href="../problems.html#pygmo.decorator_problem" title="pygmo.decorator_problem"><code class="xref py py-class docutils literal notranslate"><span class="pre">decorator_problem</span></code></a> object (<code class="docutils literal notranslate"><span class="pre">self</span></code>) and the
 decision vector (<code class="docutils literal notranslate"><span class="pre">dv</span></code>), and returns a fitness vector computed via <code class="docutils literal notranslate"><span class="pre">orig_fitness_function()</span></code>.
 The call to the original fitness function is bracketed between a couple of lines of code that measure
-the elapsed runtime via Python’s <a class="reference external" href="https://docs.python.org/3/library/time.html#time.monotonic" title="(in Python v3.12)"><code class="xref py py-func docutils literal notranslate"><span class="pre">time.monotonic()</span></code></a> function.</p>
+the elapsed runtime via Python’s <a class="reference external" href="https://docs.python.org/3/library/time.html#time.monotonic" title="(in Python v3.14)"><code class="xref py py-func docutils literal notranslate"><span class="pre">time.monotonic()</span></code></a> function.</p>
 <p>We can now construct a decorated Rosenbrock problem:</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">drb</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">problem</span><span class="p">(</span><span class="n">pg</span><span class="o">.</span><span class="n">decorator_problem</span><span class="p">(</span><span class="n">rb</span><span class="p">,</span> <span class="n">fitness_decorator</span><span class="o">=</span><span class="n">f_decor</span><span class="p">))</span>
 </pre></div>
@@ -537,8 +537,8 @@ that alter the state of the problem itself. As a concrete example, we will now
 write a fitness function decorator that logs in the calling problem all the
 decision vectors passed to the fitness function.</p>
 <p>The fitness logging decorator is rather simple:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">f_log_decor</span><span class="p">(</span><span class="n">orig_fitness_function</span><span class="p">):</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="nf">new_fitness_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dv</span><span class="p">):</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">f_log_decor</span><span class="p">(</span><span class="n">orig_fitness_function</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">new_fitness_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dv</span><span class="p">):</span>
 <span class="gp">... </span>        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;dv_log&quot;</span><span class="p">):</span>
 <span class="gp">... </span>            <span class="bp">self</span><span class="o">.</span><span class="n">dv_log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dv</span><span class="p">)</span>
 <span class="gp">... </span>        <span class="k">else</span><span class="p">:</span>
@@ -553,7 +553,7 @@ decision vectors passed to the fitness function.</p>
 condition <code class="docutils literal notranslate"><span class="pre">hasattr(self,</span> <span class="pre">&quot;dv_log&quot;)</span></code> will be <code class="docutils literal notranslate"><span class="pre">False</span></code> because, initially,
 the decorated problem does not contain any logging structure. The decorated
 fitness function will then proceed to add to the problem a 1-element
-<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> called <code class="docutils literal notranslate"><span class="pre">dv_log</span></code> containing the current decision vector <code class="docutils literal notranslate"><span class="pre">dv</span></code>;</p></li>
+<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> called <code class="docutils literal notranslate"><span class="pre">dv_log</span></code> containing the current decision vector <code class="docutils literal notranslate"><span class="pre">dv</span></code>;</p></li>
 <li><p>on subsequent calls of the decorated fitness function, the current decision vector
 <code class="docutils literal notranslate"><span class="pre">dv</span></code> will be appended to the <code class="docutils literal notranslate"><span class="pre">dv_log</span></code> list.</p></li>
 </ul>
@@ -583,7 +583,7 @@ have been logged in the internal <a class="reference internal" href="../problems
 </div>
 <p>All according to plan!</p>
 <p>Of course, the logging presented here is rather simplistic. In a real application, one may want to rely
-on Python’s <a class="reference external" href="https://docs.python.org/3/library/logging.html#module-logging" title="(in Python v3.12)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">logging</span></code></a> module rather than use an ad-hoc logging structure, and perhaps one may want
+on Python’s <a class="reference external" href="https://docs.python.org/3/library/logging.html#module-logging" title="(in Python v3.14)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">logging</span></code></a> module rather than use an ad-hoc logging structure, and perhaps one may want
 to log other information as well (e.g., the fitness vector).</p>
 </section>
 <section id="what-else-can-be-decorated">

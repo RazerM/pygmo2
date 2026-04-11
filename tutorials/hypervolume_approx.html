@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Approximating the hypervolume &#8212; pygmo 2.19.6 documentation</title>
+    <title>Approximating the hypervolume &#8212; pygmo 2.19.8 documentation</title>
   
   
   
@@ -119,7 +119,7 @@
   
   
   
-    <p class="title logo__title">pygmo 2.19.6 documentation</p>
+    <p class="title logo__title">pygmo 2.19.8 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -417,7 +417,7 @@ more information on how to do that).</p>
 <h2>FPRAS<a class="headerlink" href="#fpras" title="Permalink to this headline">#</a></h2>
 <p>The class <a class="reference internal" href="../hv_utils.html#pygmo.bf_fpras" title="pygmo.bf_fpras"><code class="xref py py-class docutils literal notranslate"><span class="pre">bf_fpras</span></code></a> found in PyGMO is a Fully Polynomial-Time Randomized Approximation Scheme accustomed
 for the computation of the hypervolume indicator. You can invoke the FPRAS as follows:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pygmo</span> <span class="k">as</span> <span class="nn">pg</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pygmo</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pg</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">prob</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">problem</span><span class="p">(</span><span class="n">pg</span><span class="o">.</span><span class="n">dtlz</span><span class="p">(</span><span class="n">prob_id</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">fdim</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">11</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pop</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">population</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fpras</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">bf_fpras</span><span class="p">(</span><span class="n">eps</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>

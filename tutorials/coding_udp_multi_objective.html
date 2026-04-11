@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Coding a User Defined Problem with multiple objectives &#8212; pygmo 2.19.6 documentation</title>
+    <title>Coding a User Defined Problem with multiple objectives &#8212; pygmo 2.19.8 documentation</title>
   
   
   
@@ -121,7 +121,7 @@
   
   
   
-    <p class="title logo__title">pygmo 2.19.6 documentation</p>
+    <p class="title logo__title">pygmo 2.19.8 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -398,29 +398,29 @@ evaluated genetic algorithms (artificial intelligence, optimization, adaptation,
 pattern recognition) (PhD). Vanderbilt University.</em> and illustrated
 <a class="reference external" href="https://en.wikipedia.org/wiki/Test_functions_for_optimization#Test_functions_for_multi-objective_optimization">here</a>.</p>
 <p>The implementation as UDP can be realized as follows:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Schaffer</span><span class="p">:</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span><span class="w"> </span><span class="nc">Schaffer</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="c1"># Define objectives</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="nf">fitness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">fitness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
 <span class="gp">... </span>        <span class="n">f1</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span>
 <span class="gp">... </span>        <span class="n">f2</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
 <span class="gp">... </span>        <span class="k">return</span> <span class="p">[</span><span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">]</span>
 <span class="gp">...</span>
 <span class="gp">... </span>    <span class="c1"># Return number of objectives</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="nf">get_nobj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">get_nobj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="gp">... </span>        <span class="k">return</span> <span class="mi">2</span>
 <span class="gp">...</span>
 <span class="gp">... </span>    <span class="c1"># Return bounds of decision variables</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="nf">get_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">get_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="gp">... </span>        <span class="k">return</span> <span class="p">([</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="mi">1</span><span class="p">)</span>
 <span class="gp">...</span>
 <span class="gp">... </span>    <span class="c1"># Return function name</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="gp">... </span>        <span class="k">return</span> <span class="s2">&quot;Schaffer function N.1&quot;</span>
 </pre></div>
 </div>
 <p>Note that the only difference between a mono- and multi-objective problem lies in the number of objectives.</p>
 <p>Let’s now create an object from our new UDP class and pass it to a pygmo <a class="reference internal" href="../problem.html#pygmo.problem" title="pygmo.problem"><code class="xref py py-class docutils literal notranslate"><span class="pre">problem</span></code></a>.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pygmo</span> <span class="k">as</span> <span class="nn">pg</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pygmo</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pg</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># create UDP</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">prob</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">problem</span><span class="p">(</span><span class="n">Schaffer</span><span class="p">())</span>
 </pre></div>

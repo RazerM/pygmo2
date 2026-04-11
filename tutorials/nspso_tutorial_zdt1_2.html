@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Benchmarking Nondominated Sorting Particle Swarm Optimizer (NSPSO) on ZDT1 and ZDT2 problems &#8212; pygmo 2.19.6 documentation</title>
+    <title>Benchmarking Nondominated Sorting Particle Swarm Optimizer (NSPSO) on ZDT1 and ZDT2 problems &#8212; pygmo 2.19.8 documentation</title>
   
   
   
@@ -119,7 +119,7 @@
   
   
   
-    <p class="title logo__title">pygmo 2.19.6 documentation</p>
+    <p class="title logo__title">pygmo 2.19.8 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -390,9 +390,9 @@ For benchmarking the aforesaid algorithms, we will use the same input parameters
 Furthermore, the same population and generation sizes will be chosen: 200 and 100, respectively.</p>
 <p>It has to be noted that our purpose is not to exactly reproduce the original paper’s results: indeed, pagmo’s version of NSPSO is slightly different. First of all, the inertia weight parameter (i.e., <em>omega</em>) is not varied dynamically, but the user can decide to implement a schedule and vary it on a generation by generation basis. Indeed, thanks to the <em>memory</em> parameter, NSPSO can be called either in one single call or iteratively in a for loop, by maintaining the same results. This allows the users to access the algorithm’s population generation by generation and to possibly change the input parameters. Secondly, in pagmo we have introduced the leader selection range parameter (i.e., <em>leader_selection_range</em>), which was not present in the original implementation.</p>
 <p>Each of the UDAs is run ten times on each problem and the results are eventually averaged and shown in terms of mean and standard deviation. The following piece of code is used for performing the benchmark:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pygmo</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pygmo</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pygmo</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pygmo</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pop_size</span><span class="o">=</span><span class="mi">200</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">problems</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1">#We declare empty arrays for storing the p-distance and mean crowding distance values for all</span>

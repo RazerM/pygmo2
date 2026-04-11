@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Coding a User Defined Island &#8212; pygmo 2.19.6 documentation</title>
+    <title>Coding a User Defined Island &#8212; pygmo 2.19.8 documentation</title>
   
   
   
@@ -119,7 +119,7 @@
   
   
   
-    <p class="title logo__title">pygmo 2.19.6 documentation</p>
+    <p class="title logo__title">pygmo 2.19.8 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -390,12 +390,12 @@ tasks and have solutions migrate improving the overall optimization quality via 
 implemented in a UDI. Also the tutorial <a class="reference internal" href="using_island.html#py-tutorial-using-island"><span class="std std-ref">Use of the class island</span></a> is a good starting point to understand the overall use.</p>
 <p>A UDI is a python class which, in its simplest form, contains the method <code class="docutils literal notranslate"><span class="pre">run_evolve(self,</span> <span class="pre">algo,</span> <span class="pre">pop)</span></code> which uses the <a class="reference internal" href="../algorithm.html#pygmo.algorithm" title="pygmo.algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">algorithm</span></code></a> <code class="docutils literal notranslate"><span class="pre">algo</span></code> to evolve
 the <a class="reference internal" href="../population.html#pygmo.population" title="pygmo.population"><code class="xref py py-class docutils literal notranslate"><span class="pre">population</span></code></a> <code class="docutils literal notranslate"><span class="pre">pop</span></code>.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pygmo</span> <span class="k">as</span> <span class="nn">pg</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">my_isl</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="nf">run_evolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algo</span><span class="p">,</span> <span class="n">pop</span><span class="p">):</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pygmo</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pg</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span><span class="w"> </span><span class="nc">my_isl</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">run_evolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algo</span><span class="p">,</span> <span class="n">pop</span><span class="p">):</span>
 <span class="gp">... </span>        <span class="n">new_pop</span> <span class="o">=</span> <span class="n">algo</span><span class="o">.</span><span class="n">evolve</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span>
 <span class="gp">... </span>        <span class="k">return</span> <span class="n">algo</span><span class="p">,</span> <span class="n">new_pop</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="gp">... </span>        <span class="k">return</span> <span class="s2">&quot;It&#39;s my island!&quot;</span>
 </pre></div>
 </div>
@@ -436,15 +436,15 @@ method, acquires the GIL and holds it during the <a class="reference internal" h
 <p>will not run evolution in parallel (only using different threads).</p>
 <p>To code properly an UDI one need to code the <code class="docutils literal notranslate"><span class="pre">def</span> <span class="pre">run_evolve(self,</span> <span class="pre">algo,</span> <span class="pre">pop)</span></code> so that the GIL is released during the offload of the evolution task to a separate process.
 An example on how this can be achieved using, for example the multiprocessing module of python. Let us have a look at some code snippets from the  <a class="reference internal" href="../islands.html#pygmo.mp_island" title="pygmo.mp_island"><code class="xref py py-class docutils literal notranslate"><span class="pre">mp_island</span></code></a></p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">_evolve_func</span><span class="p">(</span><span class="n">algo</span><span class="p">,</span> <span class="n">pop</span><span class="p">):</span> <span class="c1"># doctest : +SKIP</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">_evolve_func</span><span class="p">(</span><span class="n">algo</span><span class="p">,</span> <span class="n">pop</span><span class="p">):</span> <span class="c1"># doctest : +SKIP</span>
 <span class="gp">... </span>    <span class="n">new_pop</span> <span class="o">=</span> <span class="n">algo</span><span class="o">.</span><span class="n">evolve</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="k">return</span> <span class="n">algo</span><span class="p">,</span> <span class="n">new_pop</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">mp_island</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span> <span class="c1"># doctest : +SKIP</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span><span class="w"> </span><span class="nc">mp_island</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span> <span class="c1"># doctest : +SKIP</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="gp">... </span>        <span class="c1"># Init the process pool, if necessary.</span>
 <span class="gp">... </span>        <span class="n">mp_island</span><span class="o">.</span><span class="n">init_pool</span><span class="p">()</span>
 <span class="gp">...</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="nf">run_evolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algo</span><span class="p">,</span> <span class="n">pop</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">run_evolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algo</span><span class="p">,</span> <span class="n">pop</span><span class="p">):</span>
 <span class="gp">... </span>        <span class="k">with</span> <span class="n">mp_island</span><span class="o">.</span><span class="n">_pool_lock</span><span class="p">:</span>
 <span class="gp">... </span>            <span class="n">res</span> <span class="o">=</span> <span class="n">mp_island</span><span class="o">.</span><span class="n">_pool</span><span class="o">.</span><span class="n">apply_async</span><span class="p">(</span><span class="n">_evolve_func</span><span class="p">,</span> <span class="p">(</span><span class="n">algo</span><span class="p">,</span> <span class="n">pop</span><span class="p">))</span>
 <span class="gp">... </span>        <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>

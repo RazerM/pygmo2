@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Using pygmo’s moead &#8212; pygmo 2.19.6 documentation</title>
+    <title>Using pygmo’s moead &#8212; pygmo 2.19.8 documentation</title>
   
   
   
@@ -119,7 +119,7 @@
   
   
   
-    <p class="title logo__title">pygmo 2.19.6 documentation</p>
+    <p class="title logo__title">pygmo 2.19.8 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -389,7 +389,7 @@ in pygmo as the user-defined problem <a class="reference internal" href="../prob
 with the default settings. We can monitor the convergence of the whole population to the Pareto front
 using the <a class="reference internal" href="../problems.html#pygmo.dtlz.p_distance" title="pygmo.dtlz.p_distance"><code class="xref py py-func docutils literal notranslate"><span class="pre">p_distance()</span></code></a> metric.</p>
 <a class="reference internal image-reference" href="../_images/mo_dtlz_moead_grid_tch.png"><img alt="dtlz1 moead grid tchebycheff" class="align-right" src="../_images/mo_dtlz_moead_grid_tch.png" style="width: 480.0px; height: 360.0px;" /></a>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pygmo</span> <span class="kn">import</span> <span class="o">*</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pygmo</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">udp</span> <span class="o">=</span> <span class="n">dtlz</span><span class="p">(</span><span class="n">prob_id</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pop</span> <span class="o">=</span> <span class="n">population</span><span class="p">(</span><span class="n">prob</span> <span class="o">=</span> <span class="n">udp</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">105</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">algo</span> <span class="o">=</span> <span class="n">algorithm</span><span class="p">(</span><span class="n">moead</span><span class="p">(</span><span class="n">gen</span> <span class="o">=</span> <span class="mi">100</span><span class="p">))</span>
@@ -416,7 +416,7 @@ also compute the hypervolume indicator using the pygmo class <a class="reference
 </div>
 <p>In this case, the reference point can be set manually as the dtlz1 problem is well known. We can also visualize the
 whole population as the user-defined problem <a class="reference internal" href="../problems.html#pygmo.dtlz" title="pygmo.dtlz"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtlz</span></code></a> implements a plot functionality:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span> 
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span> 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">udp</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span> 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;DTLZ1 - MOEAD - GRID - TCHEBYCHEFF&quot;</span><span class="p">)</span> 
 </pre></div>

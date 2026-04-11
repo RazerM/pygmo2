@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Benchmarking Multi-Objective Hypervolume-based Ant Colony Optimization on ZDT3 problem &#8212; pygmo 2.19.6 documentation</title>
+    <title>Benchmarking Multi-Objective Hypervolume-based Ant Colony Optimization on ZDT3 problem &#8212; pygmo 2.19.8 documentation</title>
   
   
   
@@ -119,7 +119,7 @@
   
   
   
-    <p class="title logo__title">pygmo 2.19.6 documentation</p>
+    <p class="title logo__title">pygmo 2.19.8 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -387,9 +387,9 @@ document.write(`
 We now want to benchmark three user-defined algorithms. Since this is a multi-objective problem, we need a UDA (user-defined algorithm) which can handle constraints. Hence, we will benchmark the multi-objective ant colony optimization algorithm <a class="reference internal" href="../algorithms.html#pygmo.maco" title="pygmo.maco"><code class="xref py py-class docutils literal notranslate"><span class="pre">maco</span></code></a>, with the multi-objective EA with decomposition (MOEA/D) <a class="reference internal" href="../algorithms.html#pygmo.moead" title="pygmo.moead"><code class="xref py py-class docutils literal notranslate"><span class="pre">moead</span></code></a>, and with the non-dominated sorting GA (NSGA-II) <a class="reference internal" href="../algorithms.html#pygmo.nsga2" title="pygmo.nsga2"><code class="xref py py-class docutils literal notranslate"><span class="pre">nsga2</span></code></a>.</p>
 <p>In particular, we will make use of the three aforesaid UDAs with three different population sizes (namely, 32, 64, 128), and running each simulation three times (with a different fixed seed for each time). The Pareto front of this problem is known, and the problems in the <a class="reference internal" href="../problems.html#pygmo.zdt" title="pygmo.zdt"><code class="xref py py-class docutils literal notranslate"><span class="pre">pygmo.zdt</span></code></a> problem suite have a convergence metric implemented called <em>p_distance</em> which allows us to check how well the non dominated front is covering the known Pareto-front. Also we will use the concept of <a class="reference internal" href="../hv_utils.html#pygmo.hypervolume" title="pygmo.hypervolume"><code class="xref py py-class docutils literal notranslate"><span class="pre">hypervolume</span></code></a> as indicator to compare the final populations of the different algorithms.</p>
 <p>In order to run the UDAs on these problems we can write the following piece of code:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pygmo</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span> 
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pygmo</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span> 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pop_sizes</span><span class="o">=</span><span class="p">[</span><span class="mi">32</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">128</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">udp</span> <span class="o">=</span> <span class="n">zdt</span><span class="p">(</span><span class="n">prob_id</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">hv_moead</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
