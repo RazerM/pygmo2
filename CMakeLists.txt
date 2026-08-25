@@ -10,6 +10,13 @@ if(NOT CMAKE_BUILD_TYPE)
 	FORCE)
 endif()
 
+option(PYGMO_USE_VCPKG "Fetch pygmo's C++ dependencies with vcpkg." OFF)
+option(PYGMO_VCPKG_INSTALL_DLLS
+    "Install the vcpkg dependency DLLs next to the extension module (Windows only)." ON)
+if(PYGMO_USE_VCPKG)
+    include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/PygmoVcpkg.cmake")
+endif()
+
 project(pygmo VERSION 2.20.0 LANGUAGES CXX C)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/yacma")

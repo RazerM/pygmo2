@@ -135,7 +135,7 @@ In order to install pygmo from source, you will need:
 pybind11 is only needed at build time, and it is installed automatically
 into the isolated build environment when building via ``pip`` (see below).
 pagmo and Boost, on the other hand, must be available on your system before
-the build starts.
+the build starts, unless vcpkg builds them (see below).
 
 After making sure the dependencies are installed on your system, you can
 download the pygmo source code from the
@@ -177,6 +177,19 @@ option, e.g.:
 
    $ pip install . --config-settings=cmake.define.PYGMO_ENABLE_IPO=ON
 
+If pagmo and Boost are not installed at all, the build can fetch and compile
+them itself through `vcpkg <https://vcpkg.io/>`__:
+
+.. code-block:: console
+
+   $ pip install . --config-settings=cmake.define.PYGMO_USE_VCPKG=ON
+
+This clones a pinned vcpkg release and builds pagmo and its dependencies from
+source. On Linux and macOS they are linked statically into the extension
+module; on Windows they are DLLs installed next to it. The build needs network
+access, git and, on Linux and macOS, curl, zip, unzip and tar.
+:class:`~pygmo.ipopt` is not yet included in builds made this way.
+
 Building with CMake directly
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -207,6 +220,9 @@ such as:
   in the global modules directory of your Python installation.
 * ``PYGMO_ENABLE_IPO``: set this flag to ``ON`` to compile pygmo
   with link-time optimisations. Requires compiler support,
+  defaults to ``OFF``.
+* ``PYGMO_USE_VCPKG``: set this flag to ``ON`` to have vcpkg fetch and build
+  pygmo's C++ dependencies instead of looking for them on the system,
   defaults to ``OFF``.
 
 Please consult `CMake's documentation <https://cmake.org/cmake/help/latest/>`_

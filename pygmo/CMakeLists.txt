@@ -96,6 +96,12 @@ target_compile_features(core PRIVATE cxx_std_17)
 # Enforce vanilla C++ when compiling.
 set_property(TARGET core PROPERTY CXX_EXTENSIONS NO)
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    # Keep the symbols of statically linked dependencies out of the module's
+    # exports, where they could clash with other copies of those libraries.
+    target_link_options(core PRIVATE "LINKER:--exclude-libs,ALL")
+endif()
+
 if (PYGMO_ENABLE_IPO)
     include(CheckIPOSupported)
     check_ipo_supported(RESULT _PYGMO_IPO_RESULT OUTPUT _PYGMO_IPO_OUTPUT)
@@ -132,10 +138,32 @@ endif()
 add_subdirectory(plotting)
 
 # Install the core module.
-install(TARGETS core
+if(WIN32 AND PYGMO_USE_VCPKG AND PYGMO_VCPKG_INSTALL_DLLS)
+    if(CMAKE_VERSION VERSION_LESS 3.21)
+        message(FATAL_ERROR "Installing the vcpkg DLLs needs CMake 3.21 or later; "
+            "set PYGMO_VCPKG_INSTALL_DLLS=OFF to skip it.")
+    endif()
+    set(_PYGMO_DLL_SET RUNTIME_DEPENDENCY_SET pygmo_vcpkg_dlls)
+endif()
+install(TARGETS core ${_PYGMO_DLL_SET}
     RUNTIME DESTINATION ${_PYGMO_INSTALL_DIR}
     LIBRARY DESTINATION ${_PYGMO_INSTALL_DIR}
 )
+if(_PYGMO_DLL_SET)
+    install(RUNTIME_DEPENDENCY_SET pygmo_vcpkg_dlls
+        DESTINATION ${_PYGMO_INSTALL_DIR}
+        DIRECTORIES "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}$<$<CONFIG:Debug>:/debug>/bin"
+        # Names are lowercased before matching. Python and the C runtime can live
+        # outside System32 (python.org keeps vcruntime140.dll next to python.exe),
+        # so they are excluded by name.
+        PRE_EXCLUDE_REGEXES
+            "^api-ms-" "^ext-ms-" "^python[0-9]+t?(_d)?\\.dll$"
+            "^vcruntime[0-9_]*\\.dll$" "^msvcp[0-9_]*\\.dll$" "^concrt[0-9]*\\.dll$"
+        # Resolved paths keep their casing and may use either separator.
+        POST_EXCLUDE_REGEXES ".*[Ss][Yy][Ss][Tt][Ee][Mm]32[/\\\\].*"
+    )
+endif()
+unset(_PYGMO_DLL_SET)
 
 # Install the Python files.
 install(FILES ${PYGMO_PYTHON_FILES} "${CMAKE_CURRENT_BINARY_DIR}/_version.py"
