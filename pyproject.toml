@@ -62,10 +62,6 @@ exclude = [".github", ".clang-format", ".gitignore", "doc/_build", "doc/images"]
 build = ["cp311-*", "cp312-*", "cp313-*", "cp314-*"]
 # vcpkg has no musl support.
 skip = ["*-musllinux_*"]
-# Build the C++ stack with vcpkg. The default Linux and macOS triplets link
-# statically, so the wheels carry no third-party shared libraries and the
-# repair step has nothing to bundle.
-config-settings = { "cmake.define.PYGMO_USE_VCPKG" = "ON" }
 test-requires = ["networkx", "scipy"]
 test-command = 'python -c "import pygmo; pygmo.test.run_test_suite(1); pygmo.mp_island.shutdown_pool(); pygmo.mp_bfe.shutdown_pool()"'
 
@@ -88,4 +84,4 @@ archs = ["AMD64"]
 # Unlike the Linux and macOS defaults, x64-windows links dynamically; the
 # -static-md triplet keeps the dependencies inside the extension module while
 # still using the shared CRT that CPython itself uses.
-config-settings = { "cmake.define.PYGMO_USE_VCPKG" = "ON", "cmake.define.VCPKG_TARGET_TRIPLET" = "x64-windows-static-md" }
+config-settings = { "cmake.define.VCPKG_TARGET_TRIPLET" = "x64-windows-static-md" }

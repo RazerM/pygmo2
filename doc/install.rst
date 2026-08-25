@@ -163,34 +163,39 @@ at the source tree (or at an sdist downloaded from PyPI):
 
    $ pip install .
 
-If pagmo and Boost are installed in a location that CMake does not search
-by default, extra CMake arguments can be passed through the ``CMAKE_ARGS``
-environment variable:
+No C++ dependencies need to be installed for this to work. When building
+through pip, pygmo defaults to fetching a pinned release of
+`vcpkg <https://vcpkg.io/>`__ and building pagmo and its dependencies from
+source, linking them statically into the extension module, which then needs
+nothing else at runtime. The first build takes a few minutes; later ones reuse
+vcpkg's binary cache.
+
+.. note::
+
+   :class:`~pygmo.ipopt` is unavailable in builds made this way: vcpkg's Ipopt
+   is compiled without a sparse linear solver, and Ipopt cannot solve anything
+   without one. :class:`~pygmo.nlopt`, :class:`~pygmo.cmaes` and
+   :class:`~pygmo.xnes` are all present.
+
+To build against pagmo and Boost already installed on your system instead,
+turn vcpkg off:
 
 .. code-block:: console
 
-   $ CMAKE_ARGS="-DCMAKE_PREFIX_PATH=/path/to/prefix" pip install .
+   $ pip install . --config-settings=cmake.define.PYGMO_USE_VCPKG=OFF
 
-Individual CMake variables can also be set with pip's ``--config-settings``
-option, e.g.:
+If those are in a location CMake does not search by default, extra CMake
+arguments can be passed through the ``CMAKE_ARGS`` environment variable:
+
+.. code-block:: console
+
+   $ CMAKE_ARGS="-DPYGMO_USE_VCPKG=OFF -DCMAKE_PREFIX_PATH=/path/to/prefix" pip install .
+
+Any other CMake variable can be set the same way, e.g.:
 
 .. code-block:: console
 
    $ pip install . --config-settings=cmake.define.PYGMO_ENABLE_IPO=ON
-
-If pagmo and Boost are not installed at all, the build can fetch and compile
-them itself through `vcpkg <https://vcpkg.io/>`__:
-
-.. code-block:: console
-
-   $ pip install . --config-settings=cmake.define.PYGMO_USE_VCPKG=ON
-
-This clones a pinned vcpkg release, builds pagmo and its dependencies from
-source and links them statically into the extension module, which then needs
-nothing else at runtime. The first build takes a few minutes; later ones reuse
-vcpkg's binary cache. :class:`~pygmo.ipopt` is unavailable in builds made this
-way: vcpkg's Ipopt is compiled without a sparse linear solver, and Ipopt cannot
-solve anything without one.
 
 Building with CMake directly
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -224,8 +229,9 @@ such as:
   with link-time optimisations. Requires compiler support,
   defaults to ``OFF``.
 * ``PYGMO_USE_VCPKG``: set this flag to ``ON`` to have vcpkg fetch and build
-  pygmo's C++ dependencies instead of looking for them on the system,
-  defaults to ``OFF``.
+  pygmo's C++ dependencies instead of looking for them on the system.
+  Defaults to ``OFF`` for a direct CMake build, and to ``ON`` when building
+  through pip.
 
 Please consult `CMake's documentation <https://cmake.org/cmake/help/latest/>`_
 for more details about CMake's variables and options.
