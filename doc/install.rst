@@ -96,7 +96,9 @@ and they are updated when new pygmo versions are released.
 .. note::
 
    Due to a lack of manpower, we are currently unable to provide
-   pip packages for Windows or OSX. If you are willing to help us
+   pre-built pip packages for Windows or OSX. Users on those platforms
+   can still install pygmo with pip by building it from source, see
+   `Building with pip`_ below. If you are willing to help us
    out, please get in contact with us on the
    `gitter channel <https://gitter.im/pagmo2/Lobby>`__ or (even better)
    open a PR on `github <https://github.com/esa/pygmo2/pulls>`__.
@@ -129,7 +131,12 @@ In order to install pygmo from source, you will need:
 * `pybind11 <https://github.com/pybind/pybind11>`__ (version >= 2.10),
 * the `pagmo C++ library <https://esa.github.io/pagmo2/>`__, (version >=2.19)
 * the `Boost libraries <https://www.boost.org/>`__,
-* `CMake <https://cmake.org/>`__, version 3.18 or later.
+* `CMake <https://cmake.org/>`__, version 3.20 or later.
+
+pybind11 is only needed at build time, and it is installed automatically
+into the isolated build environment when building via ``pip`` (see below).
+pagmo and Boost, on the other hand, must be available on your system before
+the build starts.
 
 After making sure the dependencies are installed on your system, you can
 download the pygmo source code from the
@@ -143,6 +150,39 @@ version of pygmo via ``git``:
 
 We follow the usual PR-based development workflow, thus pygmo's ``master``
 branch is normally kept in a working state.
+
+Building with pip
+^^^^^^^^^^^^^^^^^
+
+pygmo is a standard Python package built with
+`scikit-build-core <https://scikit-build-core.readthedocs.io/>`__, hence
+the simplest way to build and install it from source is to point ``pip``
+at the source tree (or at an sdist downloaded from PyPI):
+
+.. code-block:: console
+
+   $ pip install .
+
+If pagmo and Boost are installed in a location that CMake does not search
+by default, extra CMake arguments can be passed through the ``CMAKE_ARGS``
+environment variable:
+
+.. code-block:: console
+
+   $ CMAKE_ARGS="-DCMAKE_PREFIX_PATH=/path/to/prefix" pip install .
+
+Individual CMake variables can also be set with pip's ``--config-settings``
+option, e.g.:
+
+.. code-block:: console
+
+   $ pip install . --config-settings=cmake.define.PYGMO_ENABLE_IPO=ON
+
+Building with CMake directly
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Invoking CMake by hand is also supported, and it is usually the more
+convenient option when developing pygmo itself.
 
 After downloading and/or unpacking pygmo's
 source code, go to pygmo's
