@@ -178,6 +178,20 @@ option, e.g.:
 
    $ pip install . --config-settings=cmake.define.PYGMO_ENABLE_IPO=ON
 
+If pagmo and Boost are not installed at all, the build can fetch and compile
+them itself through `vcpkg <https://vcpkg.io/>`__:
+
+.. code-block:: console
+
+   $ pip install . --config-settings=cmake.define.PYGMO_USE_VCPKG=ON
+
+This clones a pinned vcpkg release, builds pagmo and its dependencies from
+source and links them statically into the extension module, which then needs
+nothing else at runtime. The first build takes a few minutes; later ones reuse
+vcpkg's binary cache. :class:`~pygmo.ipopt` is unavailable in builds made this
+way: vcpkg's Ipopt is compiled without a sparse linear solver, and Ipopt cannot
+solve anything without one.
+
 Building with CMake directly
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -208,6 +222,9 @@ such as:
   in the global modules directory of your Python installation.
 * ``PYGMO_ENABLE_IPO``: set this flag to ``ON`` to compile pygmo
   with link-time optimisations. Requires compiler support,
+  defaults to ``OFF``.
+* ``PYGMO_USE_VCPKG``: set this flag to ``ON`` to have vcpkg fetch and build
+  pygmo's C++ dependencies instead of looking for them on the system,
   defaults to ``OFF``.
 
 Please consult `CMake's documentation <https://cmake.org/cmake/help/latest/>`_

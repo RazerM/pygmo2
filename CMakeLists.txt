@@ -10,6 +10,14 @@ if(NOT CMAKE_BUILD_TYPE)
 	FORCE)
 endif()
 
+# Optionally let vcpkg supply pagmo and the rest of the C++ stack, which makes
+# pygmo buildable from an sdist on a machine with no C++ dependencies
+# installed. Off by default: a normal build still expects them on the system.
+option(PYGMO_USE_VCPKG "Fetch pygmo's C++ dependencies with vcpkg." OFF)
+if(PYGMO_USE_VCPKG)
+    include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/PygmoVcpkg.cmake")
+endif()
+
 project(pygmo VERSION 2.19.8 LANGUAGES CXX C)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/yacma")
