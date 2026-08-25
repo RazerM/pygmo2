@@ -10,7 +10,15 @@ if(NOT CMAKE_BUILD_TYPE)
 	FORCE)
 endif()
 
-option(PYGMO_USE_VCPKG "Fetch pygmo's C++ dependencies with vcpkg." OFF)
+# pip builds cannot assume the C++ dependencies are installed, so they build
+# them with vcpkg by default.
+if(SKBUILD)
+    set(_PYGMO_VCPKG_DEFAULT ON)
+else()
+    set(_PYGMO_VCPKG_DEFAULT OFF)
+endif()
+option(PYGMO_USE_VCPKG "Fetch pygmo's C++ dependencies with vcpkg." ${_PYGMO_VCPKG_DEFAULT})
+unset(_PYGMO_VCPKG_DEFAULT)
 option(PYGMO_VCPKG_INSTALL_DLLS
     "Install the vcpkg dependency DLLs next to the extension module (Windows only)." ON)
 if(PYGMO_USE_VCPKG)
@@ -137,7 +145,18 @@ endif()
 # NOTE: put the minimum version in a variable
 # so that we can re-use it below.
 set (_PYGMO_MIN_PAGMO_VERSION 2.20.0)
-find_package(pagmo REQUIRED)
+find_package(pagmo)
+if(NOT pagmo_FOUND)
+    if(PYGMO_USE_VCPKG)
+        message(FATAL_ERROR
+            "pagmo was not found in the vcpkg installation. ${pagmo_NOT_FOUND_MESSAGE}")
+    else()
+        message(FATAL_ERROR
+            "The pagmo C++ library could not be found. Either install it and add its "
+            "prefix to CMAKE_PREFIX_PATH, or set PYGMO_USE_VCPKG=ON to have vcpkg "
+            "build it. ${pagmo_NOT_FOUND_MESSAGE}")
+    endif()
+endif()
 if(${pagmo_VERSION} VERSION_LESS ${_PYGMO_MIN_PAGMO_VERSION})
     message(FATAL_ERROR "The minimum pagmo version required by pygmo is ${_PYGMO_MIN_PAGMO_VERSION}, but version ${pagmo_VERSION} was found instead.")
 endif()

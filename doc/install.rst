@@ -162,33 +162,33 @@ at the source tree (or at an sdist downloaded from PyPI):
 
    $ pip install .
 
-If pagmo and Boost are installed in a location that CMake does not search
-by default, extra CMake arguments can be passed through the ``CMAKE_ARGS``
-environment variable:
-
-.. code-block:: console
-
-   $ CMAKE_ARGS="-DCMAKE_PREFIX_PATH=/path/to/prefix" pip install .
-
-Individual CMake variables can also be set with pip's ``--config-settings``
-option, e.g.:
-
-.. code-block:: console
-
-   $ pip install . --config-settings=cmake.define.PYGMO_ENABLE_IPO=ON
-
-If pagmo and Boost are not installed at all, the build can fetch and compile
-them itself through `vcpkg <https://vcpkg.io/>`__:
-
-.. code-block:: console
-
-   $ pip install . --config-settings=cmake.define.PYGMO_USE_VCPKG=ON
-
-This clones a pinned vcpkg release and builds pagmo and its dependencies from
+No C++ libraries need to be installed for this to work. When building
+through pip, pygmo defaults to fetching a pinned release of
+`vcpkg <https://vcpkg.io/>`__ and building pagmo and its dependencies from
 source. On Linux and macOS they are linked statically into the extension
 module; on Windows they are DLLs installed next to it. The build needs network
 access, git and, on Linux and macOS, curl, zip, unzip and tar.
 :class:`~pygmo.ipopt` is not yet included in builds made this way.
+
+To build against pagmo and Boost already installed on your system instead,
+turn vcpkg off:
+
+.. code-block:: console
+
+   $ pip install . --config-settings=cmake.define.PYGMO_USE_VCPKG=OFF
+
+If those are in a location CMake does not search by default, extra CMake
+arguments can be passed through the ``CMAKE_ARGS`` environment variable:
+
+.. code-block:: console
+
+   $ CMAKE_ARGS="-DPYGMO_USE_VCPKG=OFF -DCMAKE_PREFIX_PATH=/path/to/prefix" pip install .
+
+Any other CMake variable can be set the same way, e.g.:
+
+.. code-block:: console
+
+   $ pip install . --config-settings=cmake.define.PYGMO_ENABLE_IPO=ON
 
 Building with CMake directly
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -222,8 +222,9 @@ such as:
   with link-time optimisations. Requires compiler support,
   defaults to ``OFF``.
 * ``PYGMO_USE_VCPKG``: set this flag to ``ON`` to have vcpkg fetch and build
-  pygmo's C++ dependencies instead of looking for them on the system,
-  defaults to ``OFF``.
+  pygmo's C++ dependencies instead of looking for them on the system.
+  Defaults to ``OFF`` for a direct CMake build, and to ``ON`` when building
+  through pip.
 
 Please consult `CMake's documentation <https://cmake.org/cmake/help/latest/>`_
 for more details about CMake's variables and options.
