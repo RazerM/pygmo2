@@ -1,0 +1,8 @@
+# numpy and scipy stopped shipping manylinux2014 wheels (they now require
+# glibc 2.27), so on this image pip would fall back to building them from
+# source. Pin the last releases that still have compatible wheels.
+#
+# There is no numpy with both a manylinux2014 wheel and cp314 support, so
+# 3.14 is left unconstrained and handled by test-skip.
+numpy<2.3
+scipy<1.17

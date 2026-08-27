@@ -69,6 +69,8 @@ test-command = 'python -c "import pygmo; pygmo.test.run_test_suite(1); pygmo.mp_
 # The manylinux images ship neither zip nor a guaranteed unzip, both of which
 # vcpkg's bootstrap needs.
 before-all = "yum install -y zip unzip"
+# glibc 2.17, which is as low as the C++ stack can currently be built.
+manylinux-x86_64-image = "manylinux2014"
 # Only the containers can host an ipyparallel cluster, so the island tests
 # that need one run here and nowhere else.
 test-requires = ["ipyparallel", "networkx", "scipy"]
@@ -85,3 +87,24 @@ archs = ["AMD64"]
 # -static-md triplet keeps the dependencies inside the extension module while
 # still using the shared CRT that CPython itself uses.
 config-settings = { "cmake.define.VCPKG_TARGET_TRIPLET" = "x64-windows-static-md" }
+
+# CentOS 7 has neither a working package manager nor a libstdc++ new enough for
+# the ninja vcpkg would otherwise download, so x86_64 needs its own setup.
+[[tool.cibuildwheel.overrides]]
+select = "*-manylinux_x86_64"
+before-all = "bash {project}/tools/cibw_before_all_manylinux2014.sh"
+inherit.environment = "append"
+environment = { VCPKG_FORCE_SYSTEM_BINARIES = "1" }
+# The project is mounted at /project inside the container.
+test-environment = { PIP_CONSTRAINT = "/project/tools/cibw_test_constraints_manylinux2014.txt" }
+
+# No numpy release has both a manylinux2014 wheel and cp314 support, so 3.14
+# is built on the newer image, where its dependencies exist and the wheel can
+# actually be tested. Nothing is lost: a glibc 2.17 host cannot run cp314
+# pygmo anyway, for want of numpy.
+[[tool.cibuildwheel.overrides]]
+select = "cp314-manylinux_x86_64"
+manylinux-x86_64-image = "manylinux_2_28"
+before-all = "yum install -y zip unzip"
+environment = { CMAKE_BUILD_PARALLEL_LEVEL = "2" }
+test-environment = {}
