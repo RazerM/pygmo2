@@ -18,6 +18,9 @@ else()
     set(_PYGMO_VCPKG_DEFAULT OFF)
 endif()
 option(PYGMO_USE_VCPKG "Fetch pygmo's C++ dependencies with vcpkg." ${_PYGMO_VCPKG_DEFAULT})
+option(PYGMO_VCPKG_RELEASE_ONLY
+    "Skip the debug build of the vcpkg dependencies (turn off for MSVC debug builds)."
+    ${_PYGMO_VCPKG_DEFAULT})
 unset(_PYGMO_VCPKG_DEFAULT)
 option(PYGMO_VCPKG_INSTALL_DLLS
     "Install the vcpkg dependency DLLs next to the extension module (Windows only)." ON)
