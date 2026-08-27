@@ -52,6 +52,44 @@ unset(_pygmo_vcpkg_bootstrap)
 unset(_pygmo_vcpkg_stamp)
 unset(_pygmo_vcpkg_bootstrap_result)
 
+# vcpkg builds a debug and a release copy of every dependency, and pygmo only
+# uses the release one. Only a triplet can switch that off (VCPKG_BUILD_TYPE),
+# so shadow each built-in triplet with a copy that does. Overlays the caller
+# passes take precedence.
+set(_pygmo_triplet_dir "${CMAKE_BINARY_DIR}/pygmo-vcpkg-triplets")
+# vcpkg's toolchain caches VCPKG_OVERLAY_TRIPLETS, so drop our entry from a
+# previous configure first, or turning the option off would have no effect.
+list(REMOVE_ITEM VCPKG_OVERLAY_TRIPLETS "${_pygmo_triplet_dir}")
+if(PYGMO_VCPKG_RELEASE_ONLY)
+    file(MAKE_DIRECTORY "${_pygmo_triplet_dir}")
+    file(GLOB _pygmo_triplets
+        "${vcpkg_SOURCE_DIR}/triplets/*.cmake"
+        "${vcpkg_SOURCE_DIR}/triplets/community/*.cmake")
+    foreach(_pygmo_triplet IN LISTS _pygmo_triplets)
+        get_filename_component(_pygmo_triplet_name "${_pygmo_triplet}" NAME)
+        file(READ "${_pygmo_triplet}" _pygmo_triplet_body)
+        string(APPEND _pygmo_triplet_body "\nset(VCPKG_BUILD_TYPE release)\n")
+        set(_pygmo_triplet_out "${_pygmo_triplet_dir}/${_pygmo_triplet_name}")
+        # Only write on change: this runs over every built-in triplet on every
+        # configure, and rewriting them would churn their mtimes.
+        set(_pygmo_triplet_old "")
+        if(EXISTS "${_pygmo_triplet_out}")
+            file(READ "${_pygmo_triplet_out}" _pygmo_triplet_old)
+        endif()
+        if(NOT _pygmo_triplet_old STREQUAL _pygmo_triplet_body)
+            file(WRITE "${_pygmo_triplet_out}" "${_pygmo_triplet_body}")
+        endif()
+    endforeach()
+    list(APPEND VCPKG_OVERLAY_TRIPLETS "${_pygmo_triplet_dir}")
+    unset(_pygmo_triplets)
+    unset(_pygmo_triplet)
+    unset(_pygmo_triplet_name)
+    unset(_pygmo_triplet_body)
+    unset(_pygmo_triplet_out)
+    unset(_pygmo_triplet_old)
+endif()
+unset(_pygmo_triplet_dir)
+
 # vcpkg's toolchain also runs a toolchain file the caller passed, given as
 # VCPKG_CHAINLOAD_TOOLCHAIN_FILE. Never give it vcpkg's own: it includes that
 # file before its re-entry guard, so a reconfigure would recurse until CMake
