@@ -77,6 +77,47 @@ if(NOT EXISTS "${_pygmo_vcpkg_exe}" OR "${_pygmo_vcpkg_stamp}" IS_NEWER_THAN "${
     endif()
 endif()
 
+# vcpkg builds both a debug and a release configuration of every dependency by
+# default, and the debug halves are never used here. VCPKG_BUILD_TYPE is a
+# triplet setting rather than a global one, so shadow every built-in triplet
+# with a copy that appends it. Caller-provided overlays retain precedence, so
+# custom triplets remain available and are left under the caller's control.
+set(_pygmo_triplet_dir "${CMAKE_BINARY_DIR}/pygmo-vcpkg-triplets")
+# vcpkg's toolchain caches VCPKG_OVERLAY_TRIPLETS itself, so drop the entry we
+# added on any previous configure before deciding again; otherwise turning the
+# option off would leave the generated triplets in force. Everything below
+# works on a normal variable, leaving the caller's cache entry untouched.
+list(REMOVE_ITEM VCPKG_OVERLAY_TRIPLETS "${_pygmo_triplet_dir}")
+if(_PYGMO_VCPKG_RELEASE_ONLY)
+    file(MAKE_DIRECTORY "${_pygmo_triplet_dir}")
+    file(GLOB _pygmo_triplets
+        "${vcpkg_SOURCE_DIR}/triplets/*.cmake"
+        "${vcpkg_SOURCE_DIR}/triplets/community/*.cmake")
+    foreach(_pygmo_triplet IN LISTS _pygmo_triplets)
+        get_filename_component(_pygmo_triplet_name "${_pygmo_triplet}" NAME)
+        file(READ "${_pygmo_triplet}" _pygmo_triplet_body)
+        string(APPEND _pygmo_triplet_body "\nset(VCPKG_BUILD_TYPE release)\n")
+        set(_pygmo_triplet_out "${_pygmo_triplet_dir}/${_pygmo_triplet_name}")
+        # Only write on change: this runs over every built-in triplet on every
+        # configure, and rewriting them all would churn a hundred mtimes.
+        set(_pygmo_triplet_old "")
+        if(EXISTS "${_pygmo_triplet_out}")
+            file(READ "${_pygmo_triplet_out}" _pygmo_triplet_old)
+        endif()
+        if(NOT _pygmo_triplet_old STREQUAL _pygmo_triplet_body)
+            file(WRITE "${_pygmo_triplet_out}" "${_pygmo_triplet_body}")
+        endif()
+    endforeach()
+    list(APPEND VCPKG_OVERLAY_TRIPLETS "${_pygmo_triplet_dir}")
+    unset(_pygmo_triplets)
+    unset(_pygmo_triplet)
+    unset(_pygmo_triplet_name)
+    unset(_pygmo_triplet_body)
+    unset(_pygmo_triplet_out)
+    unset(_pygmo_triplet_old)
+endif()
+unset(_pygmo_triplet_dir)
+
 # Keep honouring a toolchain file the caller passed in, but never chainload
 # vcpkg's own toolchain onto itself: it includes the chainloaded file before
 # its re-entry guard, so on the second configure of a build tree that recurses
@@ -97,6 +138,3 @@ unset(_pygmo_vcpkg_exe)
 unset(_pygmo_vcpkg_bootstrap)
 unset(_pygmo_vcpkg_bootstrap_result)
 unset(_pygmo_vcpkg_stamp)
-unset(_pygmo_vcpkg_toolchain)
-unset(_pygmo_prev_toolchain)
-unset(_pygmo_own_toolchain)

@@ -21,9 +21,30 @@ else()
 endif()
 option(PYGMO_USE_VCPKG "Fetch pygmo's C++ dependencies with vcpkg." ${_PYGMO_VCPKG_DEFAULT})
 unset(_PYGMO_VCPKG_DEFAULT)
+# Tri-state rather than an option(), because option() only writes the cache on
+# the first configure: the derived default has to be recomputed so that
+# switching CMAKE_BUILD_TYPE in an existing build tree is honoured.
+set(PYGMO_VCPKG_RELEASE_ONLY "AUTO" CACHE STRING
+    "Skip the debug build of the vcpkg dependencies (AUTO, ON or OFF).")
+set_property(CACHE PYGMO_VCPKG_RELEASE_ONLY PROPERTY STRINGS AUTO ON OFF)
+if(PYGMO_VCPKG_RELEASE_ONLY STREQUAL "AUTO")
+    # A debug build of pygmo needs debug dependencies; on MSVC it would
+    # otherwise mix debug and release CRTs. Multi-config generators choose the
+    # configuration at build time, so CMAKE_BUILD_TYPE cannot answer this and
+    # the debug halves are kept.
+    if(SKBUILD AND NOT CMAKE_CONFIGURATION_TYPES
+       AND CMAKE_BUILD_TYPE MATCHES "^(Release|RelWithDebInfo|MinSizeRel)$")
+        set(_PYGMO_VCPKG_RELEASE_ONLY ON)
+    else()
+        set(_PYGMO_VCPKG_RELEASE_ONLY OFF)
+    endif()
+else()
+    set(_PYGMO_VCPKG_RELEASE_ONLY "${PYGMO_VCPKG_RELEASE_ONLY}")
+endif()
 if(PYGMO_USE_VCPKG)
     include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/PygmoVcpkg.cmake")
 endif()
+unset(_PYGMO_VCPKG_RELEASE_ONLY)
 
 project(pygmo VERSION 2.19.8 LANGUAGES CXX C)
 
