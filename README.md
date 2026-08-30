@@ -2,7 +2,7 @@ pygmo
 =====
 
 [![Python CI](https://img.shields.io/github/actions/workflow/status/esa/pygmo2/ci-python.yml?branch=master&style=for-the-badge&label=Python%20CI)](https://github.com/esa/pygmo2/actions/workflows/ci-python.yml)
-[![Manylinux CI](https://img.shields.io/github/actions/workflow/status/esa/pygmo2/ci-manylinux.yml?branch=master&style=for-the-badge&label=Manylinux%20CI)](https://github.com/esa/pygmo2/actions/workflows/ci-manylinux.yml)
+[![Wheel Builder](https://img.shields.io/github/actions/workflow/status/esa/pygmo2/wheel-builder.yml?branch=master&style=for-the-badge&label=Wheel%20Builder)](https://github.com/esa/pygmo2/actions/workflows/wheel-builder.yml)
 <!-- [![Build Status](https://img.shields.io/travis/esa/pygmo2/master.svg?logo=travis&style=for-the-badge)](https://travis-ci.com/esa/pygmo2) -->
 
 [![Anaconda-Server Badge](https://img.shields.io/conda/vn/conda-forge/pygmo.svg?style=for-the-badge)](https://anaconda.org/conda-forge/pygmo)
@@ -53,6 +53,6 @@ You can also install from PyPI:
 pip install pygmo
 ```
 
-At the moment, PyPI wheels are provided for Linux `x86_64` and Linux `aarch64` only.
-For other platforms, please use conda-forge or build from source.
-
+PyPI wheels are provided for Linux `x86_64` and `aarch64`, macOS `arm64`, and
+Windows `x64`. On other platforms, please use conda-forge or follow the
+[source-build instructions](https://esa.github.io/pygmo2/install.html#building-with-pip).

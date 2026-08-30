@@ -95,11 +95,10 @@ and they are updated when new pygmo versions are released.
 
 .. note::
 
-   Due to a lack of manpower, we are currently unable to provide
-   pre-built pip packages for Windows or OSX. Users on those platforms
-   can still install pygmo with pip by building it from source, see
-   `Building with pip`_ below. If you are willing to help us
-   out, please get in contact with us on the
+   Pre-built pip packages are available for Linux ``x86_64`` and ``aarch64``,
+   macOS ``arm64``, and Windows ``x64``. On other platforms, pip builds pygmo
+   from source; see `Building with pip`_ below. If you are willing to help us
+   out with further platforms, please get in contact with us on the
    `gitter channel <https://gitter.im/pagmo2/Lobby>`__ or (even better)
    open a PR on `github <https://github.com/esa/pygmo2/pulls>`__.
 
