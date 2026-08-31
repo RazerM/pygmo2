@@ -81,6 +81,12 @@ CMAKE_BUILD_PARALLEL_LEVEL = "2"
 [tool.cibuildwheel.macos]
 before-all = "bash {project}/tools/cibw_before_all_macos.sh"
 
+[tool.cibuildwheel.macos.environment]
+# The Fortran toolchain installed by before-all, whose runtime targets the
+# same macOS as the wheels rather than the runner's.
+PATH = "/opt/pygmo-fortran/bin:$PATH"
+FC = "/opt/pygmo-fortran/bin/gfortran"
+
 [tool.cibuildwheel.windows]
 # Without this, "auto" would add 32-bit x86.
 archs = ["AMD64"]

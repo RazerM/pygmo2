@@ -3,69 +3,48 @@
 # Install what the vcpkg dependencies need on a macOS runner.
 #
 # coin-or-ipopt and mumps build with autotools, and autoconf-archive in
-# particular is not on the images. MUMPS is Fortran, so a gfortran is needed
-# too, and the images carry no unversioned one on PATH.
+# particular is not on the images.
 #
-# The Fortran runtime is the awkward part. delocate bundles the libgfortran
-# that the extension resolves against and then refuses to tag the wheel as
-# supporting macOS older than that runtime does. Every gfortran on the images
-# ships a runtime with a 14.0 minimum, which would drag every macOS wheel up
-# from 11.0. scipy hits the same problem and solves it by shipping a runtime
-# built against an older SDK in its scipy-openblas wheels, whose README
-# explicitly invites other projects to use them that way, so take the
-# libgfortran/libquadmath/libgcc_s from there and let gfortran link those.
+# MUMPS is Fortran, and the Fortran runtime is the awkward part: delocate
+# bundles whichever libgfortran the extension resolves against, then refuses to
+# tag the wheel as supporting macOS older than that runtime does. Every
+# gfortran on the images ships a runtime with a 14.0 minimum, which would drag
+# every macOS wheel up from 11.0. conda-forge builds its toolchain against an
+# older SDK, so take the compiler and the runtime from there: both come from
+# the same build, which the image's compiler plus a borrowed runtime would not.
 
 set -Eeuo pipefail
 set -x
 
 brew install autoconf autoconf-archive automake libtool
 
-prefix="$(brew --prefix)"
-if ! command -v gfortran > /dev/null; then
-    newest="$(ls "${prefix}"/bin/gfortran-* 2> /dev/null | sort -V | tail -1 || true)"
-    [[ -n "${newest}" ]] && ln -sf "${newest}" "${prefix}/bin/gfortran" || brew install gcc
-fi
+FORTRAN_PREFIX="${FORTRAN_PREFIX:-/opt/pygmo-fortran}"
+arch="$(uname -m)"
+case "${arch}" in
+    arm64) subdir="osx-arm64" ;;
+    x86_64) subdir="osx-64" ;;
+    *) echo "unsupported arch ${arch}"; exit 1 ;;
+esac
 
-runtime_dir="$(gfortran -print-file-name=libgfortran.dylib)"
-runtime_dir="$(dirname "${runtime_dir}")"
-echo "gfortran runtime dir: ${runtime_dir}"
-for lib in libgfortran.5.dylib libquadmath.0.dylib libgcc_s.1.1.dylib; do
-    [[ -f "${runtime_dir}/${lib}" ]] &&
-        echo "  before: ${lib} minos $(otool -l "${runtime_dir}/${lib}" | awk '/LC_BUILD_VERSION/{f=1} f&&/minos/{print $2; exit}')"
-done
-
-# Fetch the low-deployment-target runtime from scipy-openblas32.
 work="$(mktemp -d)"
-url="$(python3 - <<'PY'
-import json, urllib.request
-d = json.load(urllib.request.urlopen("https://pypi.org/pypi/scipy-openblas32/json", timeout=60))
-for u in d["urls"]:
-    if "macosx" in u["filename"] and "arm64" in u["filename"]:
-        print(u["url"]); break
-PY
-)"
-echo "scipy-openblas32 wheel: ${url}"
-curl -fsSL -o "${work}/sob.whl" "${url}"
-( cd "${work}" && unzip -q sob.whl )
+trap 'rm -rf "${work}"' EXIT
+curl -Ls "https://micro.mamba.run/api/micromamba/${subdir}/latest" | tar -xj -C "${work}" bin/micromamba
 
-for lib in libgfortran.5.dylib libquadmath.0.dylib libgcc_s.1.1.dylib; do
-    src="$(find "${work}" -name "${lib}" | head -1)"
-    if [[ -n "${src}" && -f "${runtime_dir}/${lib}" ]]; then
-        echo "  replacing ${lib} (minos $(otool -l "${src}" | awk '/LC_BUILD_VERSION/{f=1} f&&/minos/{print $2; exit}'))"
-        cp -f "${src}" "${runtime_dir}/${lib}"
-        # These carry the install name delocate gave them inside the
-        # scipy-openblas32 wheel, which is where the linker would then look
-        # for them. Point them at where they actually are now.
-        install_name_tool -id "${runtime_dir}/${lib}" "${runtime_dir}/${lib}"
-        codesign --force --sign - "${runtime_dir}/${lib}"
-        echo "    install name now $(otool -D "${runtime_dir}/${lib}" | tail -1)"
-    fi
-done
-rm -rf "${work}"
+sudo mkdir -p "${FORTRAN_PREFIX}"
+sudo chown -R "$(id -un)" "${FORTRAN_PREFIX}"
+"${work}/bin/micromamba" create -y -p "${FORTRAN_PREFIX}" -c conda-forge \
+    "gfortran_${subdir}" libgfortran5
 
-for lib in libgfortran.5.dylib libquadmath.0.dylib libgcc_s.1.1.dylib; do
-    [[ -f "${runtime_dir}/${lib}" ]] &&
-        echo "  after: ${lib} minos $(otool -l "${runtime_dir}/${lib}" | awk '/LC_BUILD_VERSION/{f=1} f&&/minos/{print $2; exit}')"
+# conda-forge names the driver for its target triple; give it the plain name
+# that CMake's Fortran detection looks for.
+driver="$(find "${FORTRAN_PREFIX}/bin" -name "*-gfortran" | head -1)"
+ln -sf "${driver}" "${FORTRAN_PREFIX}/bin/gfortran"
+"${FORTRAN_PREFIX}/bin/gfortran" --version
+
+for lib in libgfortran.5.dylib libquadmath.0.dylib; do
+    f="${FORTRAN_PREFIX}/lib/${lib}"
+    [[ -f "${f}" ]] &&
+        echo "  ${lib} minos $(otool -l "${f}" | awk '/LC_BUILD_VERSION/{f=1} f&&/minos/{print $2; exit}')"
 done
 
 set +x
