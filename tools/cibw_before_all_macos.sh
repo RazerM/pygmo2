@@ -53,6 +53,12 @@ for lib in libgfortran.5.dylib libquadmath.0.dylib libgcc_s.1.1.dylib; do
     if [[ -n "${src}" && -f "${runtime_dir}/${lib}" ]]; then
         echo "  replacing ${lib} (minos $(otool -l "${src}" | awk '/LC_BUILD_VERSION/{f=1} f&&/minos/{print $2; exit}'))"
         cp -f "${src}" "${runtime_dir}/${lib}"
+        # These carry the install name delocate gave them inside the
+        # scipy-openblas32 wheel, which is where the linker would then look
+        # for them. Point them at where they actually are now.
+        install_name_tool -id "${runtime_dir}/${lib}" "${runtime_dir}/${lib}"
+        codesign --force --sign - "${runtime_dir}/${lib}"
+        echo "    install name now $(otool -D "${runtime_dir}/${lib}" | tail -1)"
     fi
 done
 rm -rf "${work}"
