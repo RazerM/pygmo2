@@ -78,9 +78,6 @@ test-command = "bash {project}/tools/cibw_test_linux.sh"
 # These runners have run out of memory building pygmo in the past.
 CMAKE_BUILD_PARALLEL_LEVEL = "2"
 
-[tool.cibuildwheel.macos]
-before-all = "bash {project}/tools/cibw_before_all_macos.sh"
-
 [tool.cibuildwheel.windows]
 # Without this, "auto" would add 32-bit x86.
 archs = ["AMD64"]
