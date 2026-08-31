@@ -79,9 +79,7 @@ test-command = "bash {project}/tools/cibw_test_linux.sh"
 CMAKE_BUILD_PARALLEL_LEVEL = "2"
 
 [tool.cibuildwheel.macos]
-# coin-or-ipopt and mumps build with autotools; autoconf-archive is the piece
-# the runners lack.
-before-all = "brew install autoconf autoconf-archive automake libtool"
+before-all = "bash {project}/tools/cibw_before_all_macos.sh"
 
 [tool.cibuildwheel.windows]
 # Without this, "auto" would add 32-bit x86.

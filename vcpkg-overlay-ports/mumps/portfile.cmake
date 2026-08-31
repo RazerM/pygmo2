@@ -13,6 +13,7 @@ vcpkg_from_github(
     PATCHES
         install-mpiseq-headers-in-subdir.patch
         use-vcpkg-lapack.patch
+        export-fortran-runtime.patch
 )
 
 # Use vcpkg's LAPACK abstraction (the `lapack` port and its cmake wrapper) rather
@@ -73,7 +74,7 @@ vcpkg_cmake_configure(
 )
 
 vcpkg_cmake_install()
-vcpkg_cmake_config_fixup(PACKAGE_NAME MUMPS CONFIG_PATH cmake)
+vcpkg_cmake_config_fixup(PACKAGE_NAME mumps CONFIG_PATH cmake)
 vcpkg_copy_pdbs()
 
 file(REMOVE_RECURSE
