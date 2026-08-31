@@ -80,12 +80,13 @@ CMAKE_BUILD_PARALLEL_LEVEL = "2"
 
 [tool.cibuildwheel.macos]
 before-all = "bash {project}/tools/cibw_before_all_macos.sh"
-
-[tool.cibuildwheel.macos.environment]
-# The Fortran toolchain installed by before-all, whose runtime targets the
-# same macOS as the wheels rather than the runner's.
-PATH = "/opt/pygmo-fortran/bin:$PATH"
-FC = "/opt/pygmo-fortran/bin/gfortran"
+# Point the build at the gfortran before-all installs. Naming it outright
+# matters: the images carry their own gfortran, and whichever one CMake picked
+# off PATH would decide the wheel's minimum macOS. Its baked-in sysroot is the
+# SDK it was built against, which is not the one on the runner.
+environment.FC = "/opt/gfortran-darwin-$(uname -m)-native/bin/gfortran"
+environment.PATH = "$PATH:/opt/gfortran-darwin-$(uname -m)-native/bin"
+environment.SDKROOT = "$(xcrun --show-sdk-path)"
 
 [tool.cibuildwheel.windows]
 # Without this, "auto" would add 32-bit x86.
