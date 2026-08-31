@@ -1,5 +1,7 @@
 # Build dirs.
 build*
+dist/
+vcpkg_installed/
 
 # Temp files.
 *~

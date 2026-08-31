@@ -10,6 +10,42 @@ if(NOT CMAKE_BUILD_TYPE)
 	FORCE)
 endif()
 
+# Optionally let vcpkg supply pagmo and the rest of the C++ stack. This is the
+# default when building a wheel, i.e. through pip, where an sdist otherwise has
+# no way of getting hold of them; a plain CMake build still expects them on the
+# system.
+if(SKBUILD)
+    set(_PYGMO_VCPKG_DEFAULT ON)
+else()
+    set(_PYGMO_VCPKG_DEFAULT OFF)
+endif()
+option(PYGMO_USE_VCPKG "Fetch pygmo's C++ dependencies with vcpkg." ${_PYGMO_VCPKG_DEFAULT})
+unset(_PYGMO_VCPKG_DEFAULT)
+# Tri-state rather than an option(), because option() only writes the cache on
+# the first configure: the derived default has to be recomputed so that
+# switching CMAKE_BUILD_TYPE in an existing build tree is honoured.
+set(PYGMO_VCPKG_RELEASE_ONLY "AUTO" CACHE STRING
+    "Skip the debug build of the vcpkg dependencies (AUTO, ON or OFF).")
+set_property(CACHE PYGMO_VCPKG_RELEASE_ONLY PROPERTY STRINGS AUTO ON OFF)
+if(PYGMO_VCPKG_RELEASE_ONLY STREQUAL "AUTO")
+    # A debug build of pygmo needs debug dependencies; on MSVC it would
+    # otherwise mix debug and release CRTs. Multi-config generators choose the
+    # configuration at build time, so CMAKE_BUILD_TYPE cannot answer this and
+    # the debug halves are kept.
+    if(SKBUILD AND NOT CMAKE_CONFIGURATION_TYPES
+       AND CMAKE_BUILD_TYPE MATCHES "^(Release|RelWithDebInfo|MinSizeRel)$")
+        set(_PYGMO_VCPKG_RELEASE_ONLY ON)
+    else()
+        set(_PYGMO_VCPKG_RELEASE_ONLY OFF)
+    endif()
+else()
+    set(_PYGMO_VCPKG_RELEASE_ONLY "${PYGMO_VCPKG_RELEASE_ONLY}")
+endif()
+if(PYGMO_USE_VCPKG)
+    include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/PygmoVcpkg.cmake")
+endif()
+unset(_PYGMO_VCPKG_RELEASE_ONLY)
+
 project(pygmo VERSION 2.19.8 LANGUAGES CXX C)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/yacma")
@@ -130,7 +166,22 @@ endif()
 # NOTE: put the minimum version in a variable
 # so that we can re-use it below.
 set (_PYGMO_MIN_PAGMO_VERSION 2.19.0)
-find_package(pagmo REQUIRED)
+# Deliberately not QUIET: pagmo's config file goes looking for Threads, Boost
+# and TBB, and when one of those is what is actually missing the config-mode
+# search output is the only thing that says so.
+find_package(pagmo)
+if(NOT pagmo_FOUND)
+    if(PYGMO_USE_VCPKG)
+        message(FATAL_ERROR
+            "vcpkg was asked to supply pagmo but it was not found afterwards. See the vcpkg "
+            "output above for the failure.")
+    else()
+        message(FATAL_ERROR
+            "The pagmo C++ library could not be found. Either install it and add its "
+            "prefix to CMAKE_PREFIX_PATH, or set PYGMO_USE_VCPKG=ON to have vcpkg "
+            "build it.")
+    endif()
+endif()
 if(${pagmo_VERSION} VERSION_LESS ${_PYGMO_MIN_PAGMO_VERSION})
     message(FATAL_ERROR "The minimum pagmo version required by pygmo is ${_PYGMO_MIN_PAGMO_VERSION}, but version ${pagmo_VERSION} was found instead.")
 endif()
@@ -151,8 +202,11 @@ if(${pybind11_VERSION} VERSION_LESS "2.10")
     message(FATAL_ERROR "pybind11 >= 2.10 is required, but version ${pybind11_VERSION} was found instead.")
 endif()
 
-# Configure the sphinx config file.
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/doc/conf.py.in" "${CMAKE_CURRENT_SOURCE_DIR}/doc/conf.py" @ONLY)
+# Configure the sphinx config file. This writes into the source tree, hence
+# it is skipped when scikit-build-core is assembling a wheel.
+if(NOT SKBUILD)
+    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/doc/conf.py.in" "${CMAKE_CURRENT_SOURCE_DIR}/doc/conf.py" @ONLY)
+endif()
 
 # Add the module directory.
 add_subdirectory(pygmo)

@@ -1,20 +1,6 @@
 # Configure the version file.
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/_version.py.in" "${CMAKE_CURRENT_BINARY_DIR}/_version.py" @ONLY)
 
-# Configure the files needed to make the python wheels (for PyPi packages)
-if(MINGW OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-        message(STATUS "Creating the files for the generation of a binary wheel.")
-        configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../tools/wheel_setup.py" "${CMAKE_CURRENT_BINARY_DIR}/../wheel/setup.py" @ONLY)
-        if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-            # NOTE: this is necessary on linux but harmful on mingw.
-            configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../tools/wheel_setup.cfg" "${CMAKE_CURRENT_BINARY_DIR}/../wheel/setup.cfg" @ONLY)
-        endif()
-        if(MINGW)
-            configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../tools/mingw_wheel_libs_python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}.txt" "${CMAKE_CURRENT_BINARY_DIR}/wheel/mingw_wheel_libs_python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}.txt" @ONLY)
-        endif()
-endif()
-
-
 # The list of pygmo's Python files.
 set(PYGMO_PYTHON_FILES
     __init__.py
@@ -109,7 +95,17 @@ if (PYGMO_ENABLE_IPO)
 endif()
 
 # Installation setup.
-if(PYGMO_INSTALL_PATH STREQUAL "")
+if(SKBUILD)
+    # SKBUILD_PLATLIB_DIR rather than a bare "pygmo": the latter is only the
+    # same thing while scikit-build-core's wheel.install-dir is left empty.
+    if(NOT PYGMO_INSTALL_PATH STREQUAL "")
+        message(WARNING
+            "PYGMO_INSTALL_PATH is ignored when building through scikit-build-core; "
+            "the module is installed into the wheel.")
+    endif()
+    set(_PYGMO_INSTALL_DIR "${SKBUILD_PLATLIB_DIR}/pygmo")
+    message(STATUS "pygmo will be installed into the wheel: ${_PYGMO_INSTALL_DIR}")
+elseif(PYGMO_INSTALL_PATH STREQUAL "")
     message(STATUS "pygmo will be installed in the default location: ${Python3_SITEARCH}")
     set(_PYGMO_INSTALL_DIR "${Python3_SITEARCH}/pygmo")
 else()

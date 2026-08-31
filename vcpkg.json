@@ -1,0 +1,13 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
+  "name": "pygmo",
+  "description": "Parallel optimisation for Python",
+  "homepage": "https://github.com/esa/pygmo2",
+  "dependencies": [
+    {
+      "name": "pagmo2",
+      "features": ["nlopt"]
+    }
+  ],
+  "builtin-baseline": "9e593bb18ea69cc5095e012465dcd675a822ed0d"
+}

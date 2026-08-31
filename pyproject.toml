@@ -1,0 +1,87 @@
+[build-system]
+requires = ["scikit-build-core>=0.10", "pybind11>=2.10"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "pygmo"
+dynamic = ["version"]
+description = "Parallel optimisation for Python"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MPL-2.0"
+license-files = ["LICENSE"]
+authors = [
+    { name = "The pagmo development team", email = "pagmo@googlegroups.com" },
+]
+keywords = [
+    "science",
+    "math",
+    "physics",
+    "optimization",
+    "ai",
+    "evolutionary-computing",
+    "parallel-computing",
+    "metaheuristics",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Programming Language :: C++",
+    "Programming Language :: Python :: 3",
+]
+dependencies = ["numpy", "cloudpickle", "scipy"]
+
+[project.urls]
+Homepage = "https://github.com/esa/pygmo2"
+Documentation = "https://esa.github.io/pygmo2/"
+Changelog = "https://esa.github.io/pygmo2/changelog.html"
+Issues = "https://github.com/esa/pygmo2/issues"
+
+[tool.scikit-build]
+minimum-version = "build-system.requires"
+build-dir = "build/{wheel_tag}"
+# pygmo/CMakeLists.txt installs the Python files itself; auto-discovery would
+# additionally copy the C++ sources sitting next to them into the wheel.
+wheel.packages = []
+
+[tool.scikit-build.metadata.version]
+provider = "scikit_build_core.metadata.regex"
+input = "CMakeLists.txt"
+regex = '''(?m)^project\(pygmo VERSION (?P<value>[0-9]+\.[0-9]+\.[0-9]+)'''
+
+[tool.scikit-build.sdist]
+exclude = [".github", ".clang-format", ".gitignore", "doc/_build", "doc/images"]
+
+[tool.cibuildwheel]
+# Trims the default set: free-threaded builds are untested and 3.15 is not
+# released yet.
+build = ["cp311-*", "cp312-*", "cp313-*", "cp314-*"]
+# vcpkg has no musl support.
+skip = ["*-musllinux_*"]
+test-requires = ["networkx", "scipy"]
+test-command = 'python -c "import pygmo; pygmo.test.run_test_suite(1); pygmo.mp_island.shutdown_pool(); pygmo.mp_bfe.shutdown_pool()"'
+
+[tool.cibuildwheel.linux]
+# The manylinux images ship neither zip nor a guaranteed unzip, both of which
+# vcpkg's bootstrap needs.
+before-all = "yum install -y zip unzip"
+# Only the containers can host an ipyparallel cluster, so the island tests
+# that need one run here and nowhere else.
+test-requires = ["ipyparallel", "networkx", "scipy"]
+test-command = "bash {project}/tools/cibw_test_linux.sh"
+
+[tool.cibuildwheel.linux.environment]
+# These runners have run out of memory building pygmo in the past.
+CMAKE_BUILD_PARALLEL_LEVEL = "2"
+
+[tool.cibuildwheel.windows]
+# Without this, "auto" would add 32-bit x86.
+archs = ["AMD64"]
+# Unlike the Linux and macOS defaults, x64-windows links dynamically; the
+# -static-md triplet keeps the dependencies inside the extension module while
+# still using the shared CRT that CPython itself uses.
+config-settings = { "cmake.define.VCPKG_TARGET_TRIPLET" = "x64-windows-static-md" }
