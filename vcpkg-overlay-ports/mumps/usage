@@ -1,0 +1,12 @@
+mumps provides CMake targets:
+
+    find_package(MUMPS CONFIG REQUIRED)
+    target_link_libraries(main PRIVATE MUMPS::DMUMPS)
+
+MUMPS is written in Fortran. Enable Fortran in your project so that CMake links
+the Fortran runtime, even if your own sources are C or C++:
+
+    project(my_project LANGUAGES C Fortran)
+
+This port builds MUMPS in sequential mode; it uses the bundled MPI stub, whose
+headers are installed to the "mumps_seq" include subdirectory.

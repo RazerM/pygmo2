@@ -82,6 +82,12 @@ endif()
 # triplet setting rather than a global one, so shadow every built-in triplet
 # with a copy that appends it. Caller-provided overlays retain precedence, so
 # custom triplets remain available and are left under the caller's control.
+# TEMPORARY: supplies mumps (absent from vcpkg entirely), a coin-or-ipopt that
+# can use it, and a pagmo2 with the ipopt feature that is merged upstream but
+# not in the pinned release. A normal variable, so caller overlays win.
+set(VCPKG_OVERLAY_PORTS
+    ${VCPKG_OVERLAY_PORTS} "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg-overlay-ports")
+
 set(_pygmo_triplet_dir "${CMAKE_BINARY_DIR}/pygmo-vcpkg-triplets")
 # vcpkg's toolchain caches VCPKG_OVERLAY_TRIPLETS itself, so drop the entry we
 # added on any previous configure before deciding again; otherwise turning the

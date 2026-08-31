@@ -68,7 +68,7 @@ test-command = 'python -c "import pygmo; pygmo.test.run_test_suite(1); pygmo.mp_
 [tool.cibuildwheel.linux]
 # The manylinux images ship neither zip nor a guaranteed unzip, both of which
 # vcpkg's bootstrap needs.
-before-all = "yum install -y zip unzip"
+before-all = "yum install -y zip unzip autoconf-archive"
 # Only the containers can host an ipyparallel cluster, so the island tests
 # that need one run here and nowhere else.
 test-requires = ["ipyparallel", "networkx", "scipy"]
@@ -77,6 +77,11 @@ test-command = "bash {project}/tools/cibw_test_linux.sh"
 [tool.cibuildwheel.linux.environment]
 # These runners have run out of memory building pygmo in the past.
 CMAKE_BUILD_PARALLEL_LEVEL = "2"
+
+[tool.cibuildwheel.macos]
+# coin-or-ipopt and mumps build with autotools; autoconf-archive is the piece
+# the runners lack.
+before-all = "brew install autoconf autoconf-archive automake libtool"
 
 [tool.cibuildwheel.windows]
 # Without this, "auto" would add 32-bit x86.
