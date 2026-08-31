@@ -28,7 +28,8 @@ esac
 
 work="$(mktemp -d)"
 trap 'rm -rf "${work}"' EXIT
-curl -Ls "https://micro.mamba.run/api/micromamba/${subdir}/latest" | tar -xj -C "${work}" bin/micromamba
+curl -Ls "https://micro.mamba.pm/api/micromamba/${subdir}/latest" -o "${work}/micromamba.tar.bz2"
+tar -xjf "${work}/micromamba.tar.bz2" -C "${work}" bin/micromamba
 
 sudo mkdir -p "${FORTRAN_PREFIX}"
 sudo chown -R "$(id -un)" "${FORTRAN_PREFIX}"
