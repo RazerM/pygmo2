@@ -1,0 +1,18 @@
+diff --git a/cmake/lapack.cmake b/cmake/lapack.cmake
+index 4201b0e..0c854a3 100644
+--- a/cmake/lapack.cmake
++++ b/cmake/lapack.cmake
+@@ -9,3 +9,13 @@ if(MUMPS_find_static)
+ endif()
+ 
+ find_package(LAPACK REQUIRED COMPONENTS ${LAPACK_VENDOR})
++
++# MUMPS calls BLAS (dgemm and friends) directly. vcpkg's FindLAPACK strips
++# BLAS_LIBRARIES out of LAPACK::LAPACK intending to substitute the BLAS::BLAS
++# target, but never adds it back, so require BLAS and attach it here. Without
++# this, BLAS is absent from the link line entirely: ELF shared objects and
++# static archives tolerate the undefined symbols, but Windows DLLs do not.
++find_package(BLAS REQUIRED)
++if(TARGET BLAS::BLAS AND TARGET LAPACK::LAPACK)
++  set_property(TARGET LAPACK::LAPACK APPEND PROPERTY INTERFACE_LINK_LIBRARIES BLAS::BLAS)
++endif()
