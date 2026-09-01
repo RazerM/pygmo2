@@ -91,7 +91,8 @@ environment.SDKROOT = "$(xcrun --show-sdk-path)"
 [tool.cibuildwheel.windows]
 # Without this, "auto" would add 32-bit x86.
 archs = ["AMD64"]
-# Unlike the Linux and macOS defaults, x64-windows links dynamically; the
-# -static-md triplet keeps the dependencies inside the extension module while
-# still using the shared CRT that CPython itself uses.
-config-settings = { "cmake.define.VCPKG_TARGET_TRIPLET" = "x64-windows-static-md" }
+# The default x64-windows triplet links dynamically. The static-md triplet
+# would keep the dependencies inside the extension module, but MUMPS is built
+# by MinGW gfortran, and MinGW cannot link the MSVC static libraries that
+# triplet produces -- only MSVC import libraries. delvewheel vendors the DLLs
+# into the wheel, the same way auditwheel and delocate do elsewhere.
