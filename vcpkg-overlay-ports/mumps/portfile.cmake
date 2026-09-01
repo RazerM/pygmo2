@@ -14,6 +14,7 @@ vcpkg_from_github(
         install-mpiseq-headers-in-subdir.patch
         use-vcpkg-lapack.patch
         export-fortran-runtime.patch
+        link-blas-explicitly.patch
 )
 
 # Use vcpkg's LAPACK abstraction (the `lapack` port and its cmake wrapper) rather
@@ -40,6 +41,12 @@ vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
         complex-double  BUILD_COMPLEX16
 )
 
+# Selects the Fortran compiler: the system gfortran on Linux/macOS, or the MinGW
+# gfortran from the vcpkg-gfortran dependency on Windows. On Windows this also
+# switches the whole port to the MinGW toolchain and forces dynamic linkage.
+include(vcpkg_find_fortran)
+vcpkg_find_fortran(FORTRAN_CMAKE)
+
 # The harness copies libseq.cmake into the extracted MUMPS source tree during
 # configure, which both configurations share, so they must not run in parallel.
 vcpkg_cmake_configure(
@@ -47,6 +54,7 @@ vcpkg_cmake_configure(
     DISABLE_PARALLEL_CONFIGURE
     OPTIONS
         ${FEATURE_OPTIONS}
+        ${FORTRAN_CMAKE}
         "-DFETCHCONTENT_SOURCE_DIR_MUMPS_UPSTREAM=${MUMPS_UPSTREAM_SOURCE_PATH}"
         "-DMUMPS_UPSTREAM_VERSION=${VERSION}"
         -DMUMPS_BUILD_TESTING=OFF

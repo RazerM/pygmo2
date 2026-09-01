@@ -16,7 +16,7 @@
   "default-features": [
     {
       "name": "mumps",
-      "platform": "!windows & !android & !ios & !emscripten"
+      "platform": "!android & !ios & !emscripten & !uwp & !xbox & !(windows & arm)"
     }
   ],
   "features": {

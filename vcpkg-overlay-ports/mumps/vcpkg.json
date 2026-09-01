@@ -4,8 +4,9 @@
   "description": "MUMPS (MUltifrontal Massively Parallel sparse direct Solver) solves systems of linear equations Ax = b where A is a square sparse matrix",
   "homepage": "https://mumps-solver.org/",
   "license": "CECILL-C AND MIT",
-  "supports": "!windows & !android & !ios & !emscripten",
+  "supports": "!android & !ios & !emscripten & !uwp & !xbox & !(windows & arm)",
   "dependencies": [
+    "blas",
     "lapack",
     {
       "name": "vcpkg-cmake",
