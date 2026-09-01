@@ -21,6 +21,11 @@ else()
 endif()
 option(PYGMO_USE_VCPKG "Fetch pygmo's C++ dependencies with vcpkg." ${_PYGMO_VCPKG_DEFAULT})
 unset(_PYGMO_VCPKG_DEFAULT)
+# vcpkg's default Windows triplet builds the dependencies as DLLs, which have to
+# sit next to the extension to be found at run time. Wheels get them from
+# delvewheel instead, which also renames them, so cibuildwheel turns this off.
+option(PYGMO_VCPKG_INSTALL_DLLS
+    "Install the vcpkg dependency DLLs next to the extension module (Windows only)." ON)
 # Tri-state rather than an option(), because option() only writes the cache on
 # the first configure: the derived default has to be recomputed so that
 # switching CMAKE_BUILD_TYPE in an existing build tree is honoured.
