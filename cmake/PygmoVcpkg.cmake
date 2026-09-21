@@ -82,7 +82,7 @@ endif()
 # triplet setting rather than a global one, so shadow every built-in triplet
 # with a copy that appends it. Caller-provided overlays retain precedence, so
 # custom triplets remain available and are left under the caller's control.
-# TEMPORARY: supplies mumps (absent from vcpkg entirely), a coin-or-ipopt that
+# TEMPORARY: supplies mumps-solver (absent from vcpkg), a coin-or-ipopt that
 # can use it, and a pagmo2 with the ipopt feature that is merged upstream but
 # not in the pinned release. A normal variable, so caller overlays win.
 set(VCPKG_OVERLAY_PORTS

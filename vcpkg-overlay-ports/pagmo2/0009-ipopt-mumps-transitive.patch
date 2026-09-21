@@ -9,11 +9,11 @@ index 46136bd..eff816c 100644
 +        # Ipopt may be built against MUMPS. When libipopt is a static library
 +        # the solver's symbols are only resolved at the final link, so they
 +        # have to be propagated to whatever consumes pagmo.
-+        find_package(MUMPS CONFIG QUIET)
-+        if(MUMPS_FOUND)
-+            message(STATUS "Ipopt was built with MUMPS; propagating MUMPS::DMUMPS.")
++        find_package(unofficial-mumps-solver CONFIG QUIET)
++        if(unofficial-mumps-solver_FOUND)
++            message(STATUS "Ipopt was built with MUMPS; propagating unofficial::mumps-solver::DMUMPS.")
 +            set_property(TARGET pagmo::IPOPT::libipopt APPEND PROPERTY
-+                INTERFACE_LINK_LIBRARIES MUMPS::DMUMPS)
++                INTERFACE_LINK_LIBRARIES unofficial::mumps-solver::DMUMPS)
 +        endif()
      endif()
  endif()

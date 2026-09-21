@@ -15,6 +15,8 @@ vcpkg_from_github(
         use-vcpkg-lapack.patch
         export-fortran-runtime.patch
         link-blas-explicitly.patch
+        unofficial-mumps-solver-pkgconfig.patch
+        unofficial-cmake-exports.patch
 )
 
 # Use vcpkg's LAPACK abstraction (the `lapack` port and its cmake wrapper) rather
@@ -46,6 +48,7 @@ vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
 # switches the whole port to the MinGW toolchain and forces dynamic linkage.
 include(vcpkg_find_fortran)
 vcpkg_find_fortran(FORTRAN_CMAKE)
+set(VCPKG_POLICY_ALLOW_OBSOLETE_MSVCRT enabled)
 
 # The harness copies libseq.cmake into the extracted MUMPS source tree during
 # configure, which both configurations share, so they must not run in parallel.
@@ -82,7 +85,8 @@ vcpkg_cmake_configure(
 )
 
 vcpkg_cmake_install()
-vcpkg_cmake_config_fixup(PACKAGE_NAME mumps CONFIG_PATH cmake)
+vcpkg_cmake_config_fixup(PACKAGE_NAME unofficial-mumps-solver CONFIG_PATH cmake)
+vcpkg_fixup_pkgconfig()
 vcpkg_copy_pdbs()
 
 file(REMOVE_RECURSE
