@@ -39,6 +39,45 @@ jobs:
           path: dist/*.tar.gz
           if-no-files-found: error
 
+  test_sdist:
+    name: Test sdist on ${{ matrix.os }}
+    needs: sdist
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-24.04
+          - macos-14
+          - windows-2022
+
+    steps:
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+
+      # What a source build needs beyond a C++ compiler: MUMPS is Fortran, and
+      # coin-or-ipopt builds with autotools. On Windows, vcpkg brings its own.
+      - name: Install build prerequisites (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get install -y gfortran autoconf autoconf-archive automake libtool
+      - name: Install build prerequisites (macOS)
+        if: runner.os == 'macOS'
+        run: brew install gcc autoconf autoconf-archive automake libtool
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: pygmo-sdist
+          path: dist
+
+      - name: Install from the sdist
+        shell: bash
+        run: python -m pip install dist/*.tar.gz networkx scipy
+
+      # No checkout, so this imports the installed package.
+      - name: Run the tests
+        run: python -c "import pygmo; pygmo.test.run_test_suite(1); pygmo.mp_island.shutdown_pool(); pygmo.mp_bfe.shutdown_pool()"
+
   build_wheels:
     name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
