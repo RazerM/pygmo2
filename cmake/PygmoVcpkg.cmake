@@ -88,6 +88,23 @@ endif()
 set(VCPKG_OVERLAY_PORTS
     ${VCPKG_OVERLAY_PORTS} "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg-overlay-ports")
 
+# Windows limits paths to 260 characters, and vcpkg's autotools builds compile
+# through long relative paths into its buildtrees. Built from an sdist, pip puts
+# vcpkg deep inside a temporary directory, and coin-or-ipopt's deepest source
+# file ends up past the limit. Build under a short per-user directory instead,
+# keyed on the build tree so that concurrent builds stay apart, and have vcpkg
+# remove each port's buildtree once it is done. A caller's own choice wins; the
+# toolchain caches this, so a reconfigure finds the option already present.
+if(WIN32 AND NOT VCPKG_INSTALL_OPTIONS MATCHES "--x-buildtrees-root" AND DEFINED ENV{LOCALAPPDATA})
+    string(SHA1 _pygmo_buildtrees_key "${CMAKE_BINARY_DIR}")
+    string(SUBSTRING "${_pygmo_buildtrees_key}" 0 8 _pygmo_buildtrees_key)
+    string(REPLACE "\\" "/" _pygmo_buildtrees "$ENV{LOCALAPPDATA}/pygmo-vcpkg/${_pygmo_buildtrees_key}")
+    set(VCPKG_INSTALL_OPTIONS ${VCPKG_INSTALL_OPTIONS}
+        "--x-buildtrees-root=${_pygmo_buildtrees}" --clean-buildtrees-after-build)
+    unset(_pygmo_buildtrees_key)
+    unset(_pygmo_buildtrees)
+endif()
+
 set(_pygmo_triplet_dir "${CMAKE_BINARY_DIR}/pygmo-vcpkg-triplets")
 # vcpkg's toolchain caches VCPKG_OVERLAY_TRIPLETS itself, so drop the entry we
 # added on any previous configure before deciding again; otherwise turning the
