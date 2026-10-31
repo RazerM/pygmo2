@@ -66,6 +66,17 @@ before-all = "yum install -y zip unzip"
 test-requires = ["ipyparallel", "networkx"]
 test-command = "bash {project}/tools/cibw_test_linux.sh"
 
+[tool.cibuildwheel.macos]
+before-all = "bash {project}/tools/cibw_before_all_macos.sh"
+# Name the compiler outright: the images' own gfortran, if CMake found it on
+# PATH, would set the wheels' minimum macOS. SDKROOT replaces the SDK path baked
+# into it, which does not exist on the runner.
+environment.FC = "/opt/gfortran-darwin-$(uname -m)-native/bin/gfortran"
+environment.SDKROOT = "$(xcrun --show-sdk-path)"
+# The runtime's install names are @rpath ones, and the extension (linked by
+# clang++) records no rpath for them; delocate also searches DYLD_LIBRARY_PATH.
+repair-wheel-command = "DYLD_LIBRARY_PATH=/opt/gfortran-darwin-$(uname -m)-native/lib delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}"
+
 [tool.cibuildwheel.windows]
 archs = ["AMD64"]
 # A fixed vcpkg install directory gives delvewheel a known place to find the
