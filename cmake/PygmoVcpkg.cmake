@@ -52,6 +52,23 @@ unset(_pygmo_vcpkg_bootstrap)
 unset(_pygmo_vcpkg_stamp)
 unset(_pygmo_vcpkg_bootstrap_result)
 
+# Windows limits paths to 260 characters and pip builds deep inside a temporary
+# directory, so put vcpkg's buildtrees and packages under a short directory in
+# TEMP instead, keyed on the build tree. vcpkg's toolchain caches
+# VCPKG_INSTALL_OPTIONS, so a reconfigure finds them already there.
+if(CMAKE_HOST_WIN32 AND DEFINED ENV{TEMP}
+   AND NOT VCPKG_INSTALL_OPTIONS MATCHES "--x-(buildtrees|packages)-root")
+    string(SHA1 _pygmo_vcpkg_key "${CMAKE_BINARY_DIR}")
+    string(SUBSTRING "${_pygmo_vcpkg_key}" 0 8 _pygmo_vcpkg_key)
+    string(REPLACE "\\" "/" _pygmo_vcpkg_scratch "$ENV{TEMP}/pygmo-vcpkg/${_pygmo_vcpkg_key}")
+    set(VCPKG_INSTALL_OPTIONS ${VCPKG_INSTALL_OPTIONS}
+        "--x-buildtrees-root=${_pygmo_vcpkg_scratch}/b"
+        "--x-packages-root=${_pygmo_vcpkg_scratch}/p"
+        --clean-buildtrees-after-build --clean-packages-after-build)
+    unset(_pygmo_vcpkg_key)
+    unset(_pygmo_vcpkg_scratch)
+endif()
+
 # vcpkg builds a debug and a release copy of every dependency, and pygmo only
 # uses the release one. Only a triplet can switch that off (VCPKG_BUILD_TYPE),
 # so shadow each built-in triplet with a copy that does. Overlays the caller
