@@ -154,4 +154,20 @@ unset(_PYGMO_DLL_SET)
 install(FILES ${PYGMO_PYTHON_FILES} "${CMAKE_CURRENT_BINARY_DIR}/_version.py"
     DESTINATION ${_PYGMO_INSTALL_DIR})
 
+# vcpkg installs each port's licence as share/<port>/copyright.
+if(SKBUILD AND PYGMO_USE_VCPKG)
+    file(GLOB _PYGMO_VCPKG_COPYRIGHTS
+        "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/share/*/copyright")
+    foreach(_PYGMO_COPYRIGHT IN LISTS _PYGMO_VCPKG_COPYRIGHTS)
+        get_filename_component(_PYGMO_PORT_DIR "${_PYGMO_COPYRIGHT}" DIRECTORY)
+        get_filename_component(_PYGMO_PORT "${_PYGMO_PORT_DIR}" NAME)
+        install(FILES "${_PYGMO_COPYRIGHT}"
+            DESTINATION "${SKBUILD_METADATA_DIR}/licenses/vcpkg/${_PYGMO_PORT}")
+    endforeach()
+    unset(_PYGMO_VCPKG_COPYRIGHTS)
+    unset(_PYGMO_COPYRIGHT)
+    unset(_PYGMO_PORT_DIR)
+    unset(_PYGMO_PORT)
+endif()
+
 unset(_PYGMO_INSTALL_DIR)
