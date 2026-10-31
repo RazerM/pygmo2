@@ -62,7 +62,7 @@ test-requires = ["networkx"]
 test-command = 'python -c "import pygmo; pygmo.test.run_test_suite(1); pygmo.mp_island.shutdown_pool(); pygmo.mp_bfe.shutdown_pool()"'
 
 [tool.cibuildwheel.linux]
-before-all = "yum install -y zip unzip"
+before-all = "yum install -y zip unzip autoconf-archive"
 test-requires = ["ipyparallel", "networkx"]
 test-command = "bash {project}/tools/cibw_test_linux.sh"
 
@@ -73,6 +73,9 @@ before-all = "bash {project}/tools/cibw_before_all_macos.sh"
 # into it, which does not exist on the runner.
 environment.FC = "/opt/gfortran-darwin-$(uname -m)-native/bin/gfortran"
 environment.SDKROOT = "$(xcrun --show-sdk-path)"
+# MUMPS's CMake config looks up gfortran itself, ignoring FC, to find the
+# Fortran runtime pygmo links.
+environment.CMAKE_ARGS = "-DMUMPS_SOLVER_GFORTRAN=/opt/gfortran-darwin-$(uname -m)-native/bin/gfortran"
 # The runtime's install names are @rpath ones, and the extension (linked by
 # clang++) records no rpath for them; delocate also searches DYLD_LIBRARY_PATH.
 repair-wheel-command = "DYLD_LIBRARY_PATH=/opt/gfortran-darwin-$(uname -m)-native/lib delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}"

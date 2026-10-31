@@ -168,6 +168,11 @@ if(SKBUILD AND PYGMO_USE_VCPKG)
     unset(_PYGMO_COPYRIGHT)
     unset(_PYGMO_PORT_DIR)
     unset(_PYGMO_PORT)
+    # MUMPS is Fortran, so the wheels also bundle GCC's runtime libraries.
+    if(TARGET pagmo::IPOPT::header)
+        install(DIRECTORY "${PROJECT_SOURCE_DIR}/tools/licenses/gcc-runtime/"
+            DESTINATION "${SKBUILD_METADATA_DIR}/licenses/gcc-runtime")
+    endif()
 endif()
 
 unset(_PYGMO_INSTALL_DIR)
