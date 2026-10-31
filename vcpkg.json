@@ -17,5 +17,37 @@
         "nlopt"
       ]
     }
-  ]
+  ],
+  "default-features": [
+    {
+      "name": "ipopt",
+      "platform": "!(windows & arm)"
+    }
+  ],
+  "features": {
+    "ipopt": {
+      "description": "Build pygmo.ipopt",
+      "dependencies": [
+        {
+          "name": "coin-or-ipopt",
+          "features": [
+            "mumps"
+          ]
+        },
+        {
+          "name": "openblas",
+          "features": [
+            "dynamic-arch"
+          ],
+          "platform": "linux & (x64 | arm64)"
+        },
+        {
+          "name": "pagmo2",
+          "features": [
+            "ipopt"
+          ]
+        }
+      ]
+    }
+  }
 }

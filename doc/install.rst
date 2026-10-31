@@ -166,8 +166,14 @@ through pip, pygmo defaults to fetching a pinned release of
 `vcpkg <https://vcpkg.io/>`__ and building pagmo and its dependencies from
 source. On Linux and macOS they are linked statically into the extension
 module; on Windows they are DLLs installed next to it. The build needs network
-access, git and, on Linux and macOS, curl, zip, unzip and tar.
-:class:`~pygmo.ipopt` is not yet included in builds made this way.
+access and git, and on Linux and macOS also:
+
+* curl, zip, unzip and tar, for vcpkg;
+* gfortran, autoconf, autoconf-archive, automake and libtool, for
+  :class:`~pygmo.ipopt` (on macOS, Homebrew's ``gcc`` provides gfortran).
+
+To build without :class:`~pygmo.ipopt`, and skip the second set, pass
+``--config-settings=cmake.define.VCPKG_MANIFEST_NO_DEFAULT_FEATURES=ON``.
 
 To build against pagmo and Boost already installed on your system instead,
 turn vcpkg off:

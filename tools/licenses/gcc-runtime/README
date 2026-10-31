@@ -1,0 +1,9 @@
+pygmo.ipopt's linear solver, MUMPS, is compiled with gfortran, so wheels that
+include it bundle GCC's runtime libraries: libgfortran, libquadmath and,
+depending on the platform, libgcc_s.
+
+libgfortran and libgcc_s: GPL-3.0-or-later WITH GCC-exception-3.1, see COPYING3
+and COPYING.RUNTIME.
+libquadmath: LGPL-2.1-or-later, see COPYING.LIB.
+
+Their source code is available from https://gcc.gnu.org/.
