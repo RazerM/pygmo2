@@ -63,6 +63,12 @@ test-command = 'python -c "import pygmo; pygmo.test.run_test_suite(1); pygmo.mp_
 
 [tool.cibuildwheel.linux]
 before-all = "yum install -y zip unzip autoconf-archive"
+# A fixed vcpkg install directory gives the repair tool a known place to find
+# the dependencies' libraries, and lets every Python version's build share it.
+# The repair tool vendors the libraries, so pygmo does not install its own
+# copies.
+config-settings = { "cmake.define.VCPKG_INSTALLED_DIR" = "/tmp/pygmo_vcpkg_installed", "cmake.define.PYGMO_VCPKG_INSTALL_LIBS" = "OFF" }
+repair-wheel-command = "LD_LIBRARY_PATH=$(echo /tmp/pygmo_vcpkg_installed/*-linux-dynamic/lib):$LD_LIBRARY_PATH auditwheel repair -w {dest_dir} {wheel}"
 test-requires = ["ipyparallel", "networkx"]
 test-command = "bash {project}/tools/cibw_test_linux.sh"
 
@@ -76,14 +82,13 @@ environment.SDKROOT = "$(xcrun --show-sdk-path)"
 # MUMPS's CMake config looks up gfortran itself, ignoring FC, to find the
 # Fortran runtime pygmo links.
 environment.CMAKE_ARGS = "-DMUMPS_SOLVER_GFORTRAN=/opt/gfortran-darwin-$(uname -m)-native/bin/gfortran"
-# The runtime's install names are @rpath ones, and the extension (linked by
-# clang++) records no rpath for them; delocate also searches DYLD_LIBRARY_PATH.
-repair-wheel-command = "DYLD_LIBRARY_PATH=/opt/gfortran-darwin-$(uname -m)-native/lib delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}"
+config-settings = { "cmake.define.VCPKG_INSTALLED_DIR" = "/tmp/pygmo_vcpkg_installed", "cmake.define.PYGMO_VCPKG_INSTALL_LIBS" = "OFF" }
+# The Fortran runtime's and vcpkg's install names are @rpath ones, and the
+# installed extension records no rpath for them; delocate also searches
+# DYLD_LIBRARY_PATH.
+repair-wheel-command = "DYLD_LIBRARY_PATH=/opt/gfortran-darwin-$(uname -m)-native/lib:$(echo /tmp/pygmo_vcpkg_installed/*-osx-dynamic/lib) delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}"
 
 [tool.cibuildwheel.windows]
 archs = ["AMD64"]
-# A fixed vcpkg install directory gives delvewheel a known place to find the
-# DLLs, and lets every Python version's build share it. delvewheel vendors the
-# DLLs, so pygmo does not install its own copies.
-config-settings = { "cmake.define.VCPKG_INSTALLED_DIR" = "C:/pygmo_vcpkg_installed", "cmake.define.PYGMO_VCPKG_INSTALL_DLLS" = "OFF" }
+config-settings = { "cmake.define.VCPKG_INSTALLED_DIR" = "C:/pygmo_vcpkg_installed", "cmake.define.PYGMO_VCPKG_INSTALL_LIBS" = "OFF" }
 repair-wheel-command = "delvewheel repair --add-path C:/pygmo_vcpkg_installed/x64-windows/bin -w {dest_dir} -v {wheel}"

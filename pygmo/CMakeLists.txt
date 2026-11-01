@@ -123,19 +123,24 @@ endif()
 add_subdirectory(plotting)
 
 # Install the core module.
-if(WIN32 AND PYGMO_USE_VCPKG AND PYGMO_VCPKG_INSTALL_DLLS)
+if(PYGMO_USE_VCPKG AND PYGMO_VCPKG_INSTALL_LIBS)
     if(CMAKE_VERSION VERSION_LESS 3.21)
-        message(FATAL_ERROR "Installing the vcpkg DLLs needs CMake 3.21 or later; "
-            "set PYGMO_VCPKG_INSTALL_DLLS=OFF to skip it.")
+        message(FATAL_ERROR "Installing the vcpkg libraries needs CMake 3.21 or later; "
+            "set PYGMO_VCPKG_INSTALL_LIBS=OFF to skip it.")
     endif()
-    set(_PYGMO_DLL_SET RUNTIME_DEPENDENCY_SET pygmo_vcpkg_dlls)
+    set(_PYGMO_LIB_SET RUNTIME_DEPENDENCY_SET pygmo_vcpkg_libs)
+    if(APPLE)
+        set_property(TARGET core PROPERTY INSTALL_RPATH "@loader_path")
+    elseif(UNIX)
+        set_property(TARGET core PROPERTY INSTALL_RPATH "$ORIGIN")
+    endif()
 endif()
-install(TARGETS core ${_PYGMO_DLL_SET}
+install(TARGETS core ${_PYGMO_LIB_SET}
     RUNTIME DESTINATION ${_PYGMO_INSTALL_DIR}
     LIBRARY DESTINATION ${_PYGMO_INSTALL_DIR}
 )
-if(_PYGMO_DLL_SET)
-    install(RUNTIME_DEPENDENCY_SET pygmo_vcpkg_dlls
+if(_PYGMO_LIB_SET AND WIN32)
+    install(RUNTIME_DEPENDENCY_SET pygmo_vcpkg_libs
         DESTINATION ${_PYGMO_INSTALL_DIR}
         DIRECTORIES "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}$<$<CONFIG:Debug>:/debug>/bin"
         # Names are lowercased before matching. Python and the C runtime can live
@@ -147,8 +152,21 @@ if(_PYGMO_DLL_SET)
         # Resolved paths keep their casing and may use either separator.
         POST_EXCLUDE_REGEXES ".*[Ss][Yy][Ss][Tt][Ee][Mm]32[/\\\\].*"
     )
+elseif(_PYGMO_LIB_SET)
+    string(REGEX REPLACE "([][+.*()^$?|\\\\])" "\\\\\\1" _PYGMO_VCPKG_TRIPLET_REGEX
+        "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/")
+    install(RUNTIME_DEPENDENCY_SET pygmo_vcpkg_libs
+        DESTINATION ${_PYGMO_INSTALL_DIR}
+        DIRECTORIES "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}$<$<CONFIG:Debug>:/debug>/lib"
+        # macOS's own libraries live in the dyld shared cache, not on disk.
+        PRE_EXCLUDE_REGEXES "^/usr/lib/" "^/System/"
+        # The system's and the compiler's libraries stay where they are.
+        POST_INCLUDE_REGEXES "^${_PYGMO_VCPKG_TRIPLET_REGEX}"
+        POST_EXCLUDE_REGEXES ".*"
+    )
+    unset(_PYGMO_VCPKG_TRIPLET_REGEX)
 endif()
-unset(_PYGMO_DLL_SET)
+unset(_PYGMO_LIB_SET)
 
 # Install the Python files.
 install(FILES ${PYGMO_PYTHON_FILES} "${CMAKE_CURRENT_BINARY_DIR}/_version.py"

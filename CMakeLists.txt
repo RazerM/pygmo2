@@ -22,8 +22,8 @@ option(PYGMO_VCPKG_RELEASE_ONLY
     "Skip the debug build of the vcpkg dependencies (turn off for MSVC debug builds)."
     ${_PYGMO_VCPKG_DEFAULT})
 unset(_PYGMO_VCPKG_DEFAULT)
-option(PYGMO_VCPKG_INSTALL_DLLS
-    "Install the vcpkg dependency DLLs next to the extension module (Windows only)." ON)
+option(PYGMO_VCPKG_INSTALL_LIBS
+    "Install the vcpkg dependencies' shared libraries next to the extension module." ON)
 if(PYGMO_USE_VCPKG)
     include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/PygmoVcpkg.cmake")
 endif()

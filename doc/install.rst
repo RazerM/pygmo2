@@ -164,9 +164,8 @@ at the source tree (or at an sdist downloaded from PyPI):
 No C++ libraries need to be installed for this to work. When building
 through pip, pygmo defaults to fetching a pinned release of
 `vcpkg <https://vcpkg.io/>`__ and building pagmo and its dependencies from
-source. On Linux and macOS they are linked statically into the extension
-module; on Windows they are DLLs installed next to it. The build needs network
-access and git, and on Linux and macOS also:
+source, as shared libraries installed next to the extension module. The build
+needs network access and git, and on Linux and macOS also:
 
 * curl, zip, unzip and tar, for vcpkg;
 * gfortran, autoconf, autoconf-archive, automake and libtool, for

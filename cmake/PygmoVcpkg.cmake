@@ -69,6 +69,33 @@ if(CMAKE_HOST_WIN32 AND DEFINED ENV{TEMP}
     unset(_pygmo_vcpkg_scratch)
 endif()
 
+# vcpkg's default Linux and macOS triplets link the dependencies statically,
+# which oneTBB does not support. Platforms without a dynamic triplet keep the
+# default.
+if(NOT CMAKE_HOST_WIN32 AND NOT VCPKG_TARGET_TRIPLET)
+    cmake_host_system_information(RESULT _pygmo_arch QUERY OS_PLATFORM)
+    if(CMAKE_OSX_ARCHITECTURES)
+        set(_pygmo_arch "${CMAKE_OSX_ARCHITECTURES}")
+    endif()
+    if(_pygmo_arch MATCHES "^(x86_64|amd64)$")
+        set(_pygmo_arch x64)
+    elseif(_pygmo_arch MATCHES "^(aarch64|arm64)$")
+        set(_pygmo_arch arm64)
+    endif()
+    cmake_host_system_information(RESULT _pygmo_os QUERY OS_NAME)
+    if(_pygmo_os STREQUAL "Linux")
+        set(_pygmo_os linux)
+    elseif(_pygmo_os STREQUAL "macOS")
+        set(_pygmo_os osx)
+    endif()
+    if(EXISTS "${vcpkg_SOURCE_DIR}/triplets/community/${_pygmo_arch}-${_pygmo_os}-dynamic.cmake")
+        set(VCPKG_TARGET_TRIPLET "${_pygmo_arch}-${_pygmo_os}-dynamic" CACHE STRING
+            "vcpkg triplet to build the dependencies for.")
+    endif()
+    unset(_pygmo_arch)
+    unset(_pygmo_os)
+endif()
+
 # vcpkg builds a debug and a release copy of every dependency, and pygmo only
 # uses the release one. Only a triplet can switch that off (VCPKG_BUILD_TYPE),
 # so shadow each built-in triplet with a copy that does. Overlays the caller
