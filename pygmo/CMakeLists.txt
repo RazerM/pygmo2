@@ -1,20 +1,6 @@
 # Configure the version file.
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/_version.py.in" "${CMAKE_CURRENT_BINARY_DIR}/_version.py" @ONLY)
 
-# Configure the files needed to make the python wheels (for PyPi packages)
-if(MINGW OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-        message(STATUS "Creating the files for the generation of a binary wheel.")
-        configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../tools/wheel_setup.py" "${CMAKE_CURRENT_BINARY_DIR}/../wheel/setup.py" @ONLY)
-        if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-            # NOTE: this is necessary on linux but harmful on mingw.
-            configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../tools/wheel_setup.cfg" "${CMAKE_CURRENT_BINARY_DIR}/../wheel/setup.cfg" @ONLY)
-        endif()
-        if(MINGW)
-            configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../tools/mingw_wheel_libs_python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}.txt" "${CMAKE_CURRENT_BINARY_DIR}/wheel/mingw_wheel_libs_python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}.txt" @ONLY)
-        endif()
-endif()
-
-
 # The list of pygmo's Python files.
 set(PYGMO_PYTHON_FILES
     __init__.py
@@ -95,6 +81,12 @@ target_compile_features(core PRIVATE cxx_std_17)
 # Enforce vanilla C++ when compiling.
 set_property(TARGET core PROPERTY CXX_EXTENSIONS NO)
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    # Keep the symbols of statically linked dependencies out of the module's
+    # exports, where they could clash with other copies of those libraries.
+    target_link_options(core PRIVATE "LINKER:--exclude-libs,ALL")
+endif()
+
 if (PYGMO_ENABLE_IPO)
     include(CheckIPOSupported)
     check_ipo_supported(RESULT _PYGMO_IPO_RESULT OUTPUT _PYGMO_IPO_OUTPUT)
@@ -109,7 +101,17 @@ if (PYGMO_ENABLE_IPO)
 endif()
 
 # Installation setup.
-if(PYGMO_INSTALL_PATH STREQUAL "")
+if(SKBUILD)
+    # SKBUILD_PLATLIB_DIR rather than a bare "pygmo": the latter is only the
+    # same thing while scikit-build-core's wheel.install-dir is left empty.
+    if(NOT PYGMO_INSTALL_PATH STREQUAL "")
+        message(WARNING
+            "PYGMO_INSTALL_PATH is ignored when building through scikit-build-core; "
+            "the module is installed into the wheel.")
+    endif()
+    set(_PYGMO_INSTALL_DIR "${SKBUILD_PLATLIB_DIR}/pygmo")
+    message(STATUS "pygmo will be installed into the wheel: ${_PYGMO_INSTALL_DIR}")
+elseif(PYGMO_INSTALL_PATH STREQUAL "")
     message(STATUS "pygmo will be installed in the default location: ${Python3_SITEARCH}")
     set(_PYGMO_INSTALL_DIR "${Python3_SITEARCH}/pygmo")
 else()
@@ -121,13 +123,56 @@ endif()
 add_subdirectory(plotting)
 
 # Install the core module.
-install(TARGETS core
+if(WIN32 AND PYGMO_USE_VCPKG AND PYGMO_VCPKG_INSTALL_DLLS)
+    if(CMAKE_VERSION VERSION_LESS 3.21)
+        message(FATAL_ERROR "Installing the vcpkg DLLs needs CMake 3.21 or later; "
+            "set PYGMO_VCPKG_INSTALL_DLLS=OFF to skip it.")
+    endif()
+    set(_PYGMO_DLL_SET RUNTIME_DEPENDENCY_SET pygmo_vcpkg_dlls)
+endif()
+install(TARGETS core ${_PYGMO_DLL_SET}
     RUNTIME DESTINATION ${_PYGMO_INSTALL_DIR}
     LIBRARY DESTINATION ${_PYGMO_INSTALL_DIR}
 )
+if(_PYGMO_DLL_SET)
+    install(RUNTIME_DEPENDENCY_SET pygmo_vcpkg_dlls
+        DESTINATION ${_PYGMO_INSTALL_DIR}
+        DIRECTORIES "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}$<$<CONFIG:Debug>:/debug>/bin"
+        # Names are lowercased before matching. Python and the C runtime can live
+        # outside System32 (python.org keeps vcruntime140.dll next to python.exe),
+        # so they are excluded by name.
+        PRE_EXCLUDE_REGEXES
+            "^api-ms-" "^ext-ms-" "^python[0-9]+t?(_d)?\\.dll$"
+            "^vcruntime[0-9_]*\\.dll$" "^msvcp[0-9_]*\\.dll$" "^concrt[0-9]*\\.dll$"
+        # Resolved paths keep their casing and may use either separator.
+        POST_EXCLUDE_REGEXES ".*[Ss][Yy][Ss][Tt][Ee][Mm]32[/\\\\].*"
+    )
+endif()
+unset(_PYGMO_DLL_SET)
 
 # Install the Python files.
 install(FILES ${PYGMO_PYTHON_FILES} "${CMAKE_CURRENT_BINARY_DIR}/_version.py"
     DESTINATION ${_PYGMO_INSTALL_DIR})
+
+# vcpkg installs each port's licence as share/<port>/copyright.
+if(SKBUILD AND PYGMO_USE_VCPKG)
+    file(GLOB _PYGMO_VCPKG_COPYRIGHTS
+        "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/share/*/copyright")
+    foreach(_PYGMO_COPYRIGHT IN LISTS _PYGMO_VCPKG_COPYRIGHTS)
+        get_filename_component(_PYGMO_PORT_DIR "${_PYGMO_COPYRIGHT}" DIRECTORY)
+        get_filename_component(_PYGMO_PORT "${_PYGMO_PORT_DIR}" NAME)
+        install(FILES "${_PYGMO_COPYRIGHT}"
+            DESTINATION "${SKBUILD_METADATA_DIR}/licenses/vcpkg/${_PYGMO_PORT}")
+    endforeach()
+    unset(_PYGMO_VCPKG_COPYRIGHTS)
+    unset(_PYGMO_COPYRIGHT)
+    unset(_PYGMO_PORT_DIR)
+    unset(_PYGMO_PORT)
+    # MUMPS is Fortran, so the wheels also bundle GCC's runtime libraries.
+    if(TARGET pagmo::IPOPT::header)
+        install(DIRECTORY "${PROJECT_SOURCE_DIR}/tools/licenses/gcc-runtime/"
+            DESTINATION "${SKBUILD_METADATA_DIR}/licenses/gcc-runtime")
+    endif()
+endif()
 
 unset(_PYGMO_INSTALL_DIR)

@@ -6,9 +6,8 @@ Dependencies
 
 pygmo has the following **mandatory** runtime dependencies:
 
-* `Python <https://www.python.org/>`__ 3.4 or later (Python 2.x is
-  **not** supported),
-* the `pagmo C++ library <https://esa.github.io/pagmo2/>`__, version 2.19 or later,
+* `Python <https://www.python.org/>`__ 3.11 or later,
+* the `pagmo C++ library <https://esa.github.io/pagmo2/>`__, version 2.20 or later,
 * the `Boost serialization library <https://www.boost.org/doc/libs/release/libs/serialization/doc/index.html>`__,
   version 1.60 or later,
 * `NumPy <https://numpy.org/>`__,
@@ -55,7 +54,7 @@ your conda installation.
 pip
 ^^^
 
-pygmo is also available on Linux via the `pip <https://pip.pypa.io/en/stable/>`__
+pygmo is also available via the `pip <https://pip.pypa.io/en/stable/>`__
 package installer. The installation of pygmo with pip is straightforward:
 
 .. code-block:: console
@@ -95,9 +94,10 @@ and they are updated when new pygmo versions are released.
 
 .. note::
 
-   Due to a lack of manpower, we are currently unable to provide
-   pip packages for Windows or OSX. If you are willing to help us
-   out, please get in contact with us on the
+   Pre-built pip packages are available for Linux ``x86_64`` and ``aarch64``,
+   macOS ``arm64``, and Windows ``x64``. On other platforms, pip builds pygmo
+   from source; see `Building with pip`_ below. If you are willing to help us
+   out with further platforms, please get in contact with us on the
    `gitter channel <https://gitter.im/pagmo2/Lobby>`__ or (even better)
    open a PR on `github <https://github.com/esa/pygmo2/pulls>`__.
 
@@ -127,13 +127,18 @@ In order to install pygmo from source, you will need:
   Clang or MSVC should do),
 * a `Python <https://www.python.org/>`__ installation,
 * `pybind11 <https://github.com/pybind/pybind11>`__ (version >= 2.10),
-* the `pagmo C++ library <https://esa.github.io/pagmo2/>`__, (version >=2.19)
+* the `pagmo C++ library <https://esa.github.io/pagmo2/>`__, (version >=2.20)
 * the `Boost libraries <https://www.boost.org/>`__,
-* `CMake <https://cmake.org/>`__, version 3.18 or later.
+* `CMake <https://cmake.org/>`__, version 3.20 or later.
+
+pybind11 is only needed at build time, and it is installed automatically
+into the isolated build environment when building via ``pip`` (see below).
+pagmo and Boost, on the other hand, must be available on your system before
+the build starts, unless vcpkg builds them (see below).
 
 After making sure the dependencies are installed on your system, you can
 download the pygmo source code from the
-`GitHub release page <https://github.com/esa/pygmo/releases>`__. Alternatively,
+`GitHub release page <https://github.com/esa/pygmo2/releases>`__. Alternatively,
 and if you like living on the bleeding edge, you can get the very latest
 version of pygmo via ``git``:
 
@@ -143,6 +148,58 @@ version of pygmo via ``git``:
 
 We follow the usual PR-based development workflow, thus pygmo's ``master``
 branch is normally kept in a working state.
+
+Building with pip
+^^^^^^^^^^^^^^^^^
+
+pygmo is a standard Python package built with
+`scikit-build-core <https://scikit-build-core.readthedocs.io/>`__, hence
+the simplest way to build and install it from source is to point ``pip``
+at the source tree (or at an sdist downloaded from PyPI):
+
+.. code-block:: console
+
+   $ pip install .
+
+No C++ libraries need to be installed for this to work. When building
+through pip, pygmo defaults to fetching a pinned release of
+`vcpkg <https://vcpkg.io/>`__ and building pagmo and its dependencies from
+source. On Linux and macOS they are linked statically into the extension
+module; on Windows they are DLLs installed next to it. The build needs network
+access and git, and on Linux and macOS also:
+
+* curl, zip, unzip and tar, for vcpkg;
+* gfortran, autoconf, autoconf-archive, automake and libtool, for
+  :class:`~pygmo.ipopt` (on macOS, Homebrew's ``gcc`` provides gfortran).
+
+To build without :class:`~pygmo.ipopt`, and skip the second set, pass
+``--config-settings=cmake.define.VCPKG_MANIFEST_NO_DEFAULT_FEATURES=ON``.
+
+To build against pagmo and Boost already installed on your system instead,
+turn vcpkg off:
+
+.. code-block:: console
+
+   $ pip install . --config-settings=cmake.define.PYGMO_USE_VCPKG=OFF
+
+If those are in a location CMake does not search by default, extra CMake
+arguments can be passed through the ``CMAKE_ARGS`` environment variable:
+
+.. code-block:: console
+
+   $ CMAKE_ARGS="-DPYGMO_USE_VCPKG=OFF -DCMAKE_PREFIX_PATH=/path/to/prefix" pip install .
+
+Any other CMake variable can be set the same way, e.g.:
+
+.. code-block:: console
+
+   $ pip install . --config-settings=cmake.define.PYGMO_ENABLE_IPO=ON
+
+Building with CMake directly
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Invoking CMake by hand is also supported, and it is usually the more
+convenient option when developing pygmo itself.
 
 After downloading and/or unpacking pygmo's
 source code, go to pygmo's
@@ -169,6 +226,10 @@ such as:
 * ``PYGMO_ENABLE_IPO``: set this flag to ``ON`` to compile pygmo
   with link-time optimisations. Requires compiler support,
   defaults to ``OFF``.
+* ``PYGMO_USE_VCPKG``: set this flag to ``ON`` to have vcpkg fetch and build
+  pygmo's C++ dependencies instead of looking for them on the system.
+  Defaults to ``OFF`` for a direct CMake build, and to ``ON`` when building
+  through pip.
 
 Please consult `CMake's documentation <https://cmake.org/cmake/help/latest/>`_
 for more details about CMake's variables and options.
@@ -217,9 +278,8 @@ same Python environment in which you installed pygmo:
 
    $ python -m pip install --upgrade sphinx myst-nb sphinx-book-theme
 
-Configure and install pygmo as described above first: CMake generates
-``doc/conf.py``, and Sphinx imports the installed pygmo package to build
-the API reference. Then, from the source tree:
+Install pygmo as described above first: Sphinx imports it to build the API
+reference and to read its version. Then, from the source tree:
 
 .. code-block:: console
 
