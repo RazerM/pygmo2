@@ -3140,6 +3140,7 @@ class nlopt_test_case(_ut.TestCase):
 
     def runTest(self):
         from .core import nlopt, algorithm, luksan_vlcek1, problem, population
+        from .core import rosenbrock
 
         n = nlopt()
         self.assertEqual(n.get_solver_name(), "cobyla")
@@ -3281,6 +3282,22 @@ class nlopt_test_case(_ut.TestCase):
         algo = algorithm(n)
         algo.evolve(pop)
         self.assertTrue(algo.extract(nlopt).get_last_opt_result() >= 0)
+
+        # NLopt can be built without its LGPL Luksan solvers, which then fail
+        # without raising.
+        for solver in [
+            "lbfgs",
+            "tnewton_precond_restart",
+            "tnewton_precond",
+            "tnewton_restart",
+            "tnewton",
+            "var2",
+            "var1",
+        ]:
+            with self.subTest(solver=solver):
+                algo = algorithm(nlopt(solver))
+                algo.evolve(population(problem(rosenbrock(5)), 1, seed=1))
+                self.assertTrue(algo.extract(nlopt).get_last_opt_result() >= 0)
 
         # Refcount.
         import sys
