@@ -151,8 +151,5 @@ if(${pybind11_VERSION} VERSION_LESS "2.10")
     message(FATAL_ERROR "pybind11 >= 2.10 is required, but version ${pybind11_VERSION} was found instead.")
 endif()
 
-# Configure the sphinx config file.
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/doc/conf.py.in" "${CMAKE_CURRENT_SOURCE_DIR}/doc/conf.py" @ONLY)
-
 # Add the module directory.
 add_subdirectory(pygmo)
