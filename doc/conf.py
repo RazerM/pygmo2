@@ -14,6 +14,8 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+import pygmo
+
 
 # -- Project information -----------------------------------------------------
 
@@ -26,7 +28,7 @@ author = 'pagmo development team'
 # built documents.
 #
 # The short X.Y version.
-version = '@pygmo_VERSION@'
+version = pygmo.__version__
 # The full version, including alpha/beta/rc tags.
 release = version
 

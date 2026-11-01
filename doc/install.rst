@@ -217,9 +217,8 @@ same Python environment in which you installed pygmo:
 
    $ python -m pip install --upgrade sphinx myst-nb sphinx-book-theme
 
-Configure and install pygmo as described above first: CMake generates
-``doc/conf.py``, and Sphinx imports the installed pygmo package to build
-the API reference. Then, from the source tree:
+Install pygmo as described above first: Sphinx imports it to build the API
+reference and to read its version. Then, from the source tree:
 
 .. code-block:: console
 
